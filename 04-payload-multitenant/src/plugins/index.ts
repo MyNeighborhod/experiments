@@ -1,14 +1,16 @@
+import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { searchFields } from '@/search/fieldOverrides'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
-import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { Plugin } from 'payload'
-import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
-import { searchFields } from '@/search/fieldOverrides'
-import { beforeSyncWithSearch } from '@/search/beforeSync'
+import { Plugin } from 'payload'
+
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -22,6 +24,8 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
+
+const SUPER_ADMIN_EMAILS = ['eugen8@gmail.com']
 
 export const plugins: Plugin[] = [
   redirectsPlugin({
@@ -88,5 +92,20 @@ export const plugins: Plugin[] = [
         return [...defaultFields, ...searchFields]
       },
     },
+  }),
+  // Multi-tenant plugin added by me here:
+  multiTenantPlugin({
+    tenantsSlug: 'tenants',
+    collections: {
+      pages: {},
+      posts: {},
+      media: {},
+    },
+    // only super-admin has access to all tenants
+    userHasAccessToAllTenants: (user) => {
+      // in the future by role
+      return user?.email !== undefined && SUPER_ADMIN_EMAILS.includes(user.email)
+    },
+    // userHasAccessToAllTenants: () => true,
   }),
 ]
