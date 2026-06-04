@@ -55,3 +55,18 @@ sed -i '' 's|DATABASE_URL=.*|DATABASE_URL=postgres://postgres:local@127.0.0.1:54
 
 ```
 
+
+4. Payload CMS Multi-Tenant project :
+A:
+Run via npx `npx create-payload-app --example multi-tenant --use-pnpm`
+[brokern out of the box] other examples: https://github.com/payloadcms/payload/tree/main/examples
+
+B:
+`npx create-payload-app@latest -n 04-payload-multitenant -t website --use-pnpm`
+then (once the db is setup in docker and .env):
+`pnpm add @payloadcms/plugin-multi-tenant@3.85.0`
+`pnpm dev`
+go to admin http://localhost:3000/admin/login 
+
+
+

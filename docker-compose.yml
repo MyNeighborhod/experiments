@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  # PostgreSQL Service
+  postgres:
+    restart: always
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local
+      POSTGRES_DB: 03-payload-website
+    volumes:
+      # to mount a local folder instead of a vm docker folder:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+volumes:
+  data:
+  # pgdata:
+  node_modules:
