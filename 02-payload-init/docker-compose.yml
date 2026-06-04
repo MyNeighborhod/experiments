@@ -31,18 +31,21 @@ services:
   # Uncomment the following to use postgres
   postgres:
     restart: always
-    image: postgres:latest
+    image: postgres:15-alpine
+    # added later:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: local
       POSTGRES_DB: 02-payload-init
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # - pgdata:/var/lib/postgresql/data
+      # to mount a local folder instead of a vm docker folder:
+      - ./pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
 volumes:
-  data:
-  pgdata:
+  data: # pgdata:
+
   node_modules:
 
