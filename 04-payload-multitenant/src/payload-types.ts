@@ -521,6 +521,7 @@ export interface CallToActionBlock {
 export interface ContentBlock {
   columns?:
     | {
+        type?: ('text' | 'media') | null;
         size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
         richText?: {
           root: {
@@ -537,6 +538,7 @@ export interface ContentBlock {
           };
           [k: string]: unknown;
         } | null;
+        media?: (number | null) | Media;
         enableLink?: boolean | null;
         link?: {
           type?: ('reference' | 'custom') | null;
@@ -1237,8 +1239,10 @@ export interface ContentBlockSelect<T extends boolean = true> {
   columns?:
     | T
     | {
+        type?: T;
         size?: T;
         richText?: T;
+        media?: T;
         enableLink?: T;
         link?:
           | T

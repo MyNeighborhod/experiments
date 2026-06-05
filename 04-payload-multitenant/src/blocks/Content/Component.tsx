@@ -5,6 +5,7 @@ import RichText from '@/components/RichText'
 import type { ContentBlock as ContentBlockProps } from '@/payload-types'
 
 import { CMSLink } from '../../components/Link'
+import { Media } from '../../components/Media'
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
   const { columns } = props
@@ -22,7 +23,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
         {columns &&
           columns.length > 0 &&
           columns.map((col, index) => {
-            const { enableLink, link, richText, size } = col
+            const { type = 'text', enableLink, link, richText, media, size } = col
 
             return (
               <div
@@ -31,9 +32,16 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 })}
                 key={index}
               >
-                {richText && <RichText data={richText} enableGutter={false} />}
+                {type === 'text' && richText && <RichText data={richText} enableGutter={false} />}
 
-                {enableLink && <CMSLink {...link} />}
+                {type === 'text' && enableLink && <CMSLink {...link} />}
+
+                {type === 'media' && media && (
+                  <Media
+                    imgClassName="border border-border rounded-[0.8rem] w-full"
+                    resource={media}
+                  />
+                )}
               </div>
             )
           })}

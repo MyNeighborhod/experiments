@@ -11,6 +11,21 @@ import { link } from '@/fields/link'
 
 const columnFields: Field[] = [
   {
+    name: 'type',
+    type: 'select',
+    defaultValue: 'text',
+    options: [
+      {
+        label: 'Text',
+        value: 'text',
+      },
+      {
+        label: 'Media',
+        value: 'media',
+      },
+    ],
+  },
+  {
     name: 'size',
     type: 'select',
     defaultValue: 'oneThird',
@@ -47,16 +62,30 @@ const columnFields: Field[] = [
       },
     }),
     label: false,
+    admin: {
+      condition: (_, siblingData) => siblingData?.type !== 'media',
+    },
+  },
+  {
+    name: 'media',
+    type: 'upload',
+    relationTo: 'media',
+    admin: {
+      condition: (_, siblingData) => siblingData?.type === 'media',
+    },
   },
   {
     name: 'enableLink',
     type: 'checkbox',
+    admin: {
+      condition: (_, siblingData) => siblingData?.type !== 'media',
+    },
   },
   link({
     overrides: {
       admin: {
         condition: (_data, siblingData) => {
-          return Boolean(siblingData?.enableLink)
+          return siblingData?.type !== 'media' && Boolean(siblingData?.enableLink)
         },
       },
     },
