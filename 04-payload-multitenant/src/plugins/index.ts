@@ -100,6 +100,13 @@ export const plugins: Plugin[] = [
       pages: {},
       posts: {},
       media: {},
+      search: {},
+      header: {
+        isGlobal: true,
+      },
+      footer: {
+        isGlobal: true,
+      },
     },
     // only super-admin has access to all tenants
     userHasAccessToAllTenants: (user) => {

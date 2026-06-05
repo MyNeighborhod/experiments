@@ -9,13 +9,63 @@ import PageClient from './page.client'
 import { CardPostData } from '@/components/Card'
 
 type Args = {
+  params: Promise<{
+    tenant: string
+  }>
   searchParams: Promise<{
     q: string
   }>
 }
-export default async function Page({ searchParams: searchParamsPromise }: Args) {
+export default async function Page({ params: paramsPromise, searchParams: searchParamsPromise }: Args) {
+  const { tenant } = await paramsPromise
   const { q: query } = await searchParamsPromise
   const payload = await getPayload({ config: configPromise })
+
+  // Resolve tenant ID
+  const tenantDoc = await payload.find({
+    collection: 'tenants',
+    where: {
+      or: [
+        { slug: { equals: tenant } },
+        { domain: { equals: tenant } },
+      ],
+    },
+    limit: 1,
+  })
+
+  const tenantId = tenantDoc.docs[0]?.id
+
+  const conditions: any[] = []
+  if (tenantId) {
+    conditions.push({ tenant: { equals: tenantId } })
+  }
+
+  if (query) {
+    conditions.push({
+      or: [
+        {
+          title: {
+            like: query,
+          },
+        },
+        {
+          'meta.description': {
+            like: query,
+          },
+        },
+        {
+          'meta.title': {
+            like: query,
+          },
+        },
+        {
+          slug: {
+            like: query,
+          },
+        },
+      ],
+    })
+  }
 
   const posts = await payload.find({
     collection: 'search',
@@ -29,34 +79,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
     },
     // pagination: false reduces overhead if you don't need totalDocs
     pagination: false,
-    ...(query
-      ? {
-          where: {
-            or: [
-              {
-                title: {
-                  like: query,
-                },
-              },
-              {
-                'meta.description': {
-                  like: query,
-                },
-              },
-              {
-                'meta.title': {
-                  like: query,
-                },
-              },
-              {
-                slug: {
-                  like: query,
-                },
-              },
-            ],
-          },
-        }
-      : {}),
+    where: conditions.length > 0 ? { and: conditions } : undefined,
   })
 
   return (

@@ -23,13 +23,19 @@ export async function generateStaticParams() {
     limit: 1000,
     overrideAccess: false,
     pagination: false,
+    depth: 1,
     select: {
       slug: true,
+      tenant: true,
     },
   })
 
-  const params = posts.docs.map(({ slug }) => {
-    return { slug }
+  const params = posts.docs.map((doc) => {
+    const tenantSlug = typeof doc.tenant === 'object' && doc.tenant !== null ? doc.tenant.slug : 'default'
+    return {
+      tenant: tenantSlug,
+      slug: doc.slug,
+    }
   })
 
   return params
@@ -37,17 +43,18 @@ export async function generateStaticParams() {
 
 type Args = {
   params: Promise<{
+    tenant: string
     slug?: string
   }>
 }
 
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { slug = '' } = await paramsPromise
+  const { slug = '', tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/posts/' + decodedSlug
-  const post = await queryPostBySlug({ slug: decodedSlug })
+  const post = await queryPostBySlug({ slug: decodedSlug, tenant })
 
   if (!post) return <PayloadRedirects url={url} />
 
@@ -78,18 +85,32 @@ export default async function Post({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = '' } = await paramsPromise
+  const { slug = '', tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const post = await queryPostBySlug({ slug: decodedSlug })
+  const post = await queryPostBySlug({ slug: decodedSlug, tenant })
 
   return generateMeta({ doc: post })
 }
 
-const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPostBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: string }) => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
+
+  // Resolve tenant ID
+  const tenantDoc = await payload.find({
+    collection: 'tenants',
+    where: {
+      or: [
+        { slug: { equals: tenant } },
+        { domain: { equals: tenant } },
+      ],
+    },
+    limit: 1,
+  })
+
+  const tenantId = tenantDoc.docs[0]?.id
 
   const result = await payload.find({
     collection: 'posts',
@@ -98,9 +119,10 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
     overrideAccess: draft,
     pagination: false,
     where: {
-      slug: {
-        equals: slug,
-      },
+      and: [
+        { slug: { equals: slug } },
+        ...(tenantId ? [{ tenant: { equals: tenantId } }] : []),
+      ],
     },
   })
 

@@ -21,8 +21,10 @@ export async function generateStaticParams() {
     limit: 1000,
     overrideAccess: false,
     pagination: false,
+    depth: 1,
     select: {
       slug: true,
+      tenant: true,
     },
   })
 
@@ -30,8 +32,12 @@ export async function generateStaticParams() {
     ?.filter((doc) => {
       return doc.slug !== 'home'
     })
-    .map(({ slug }) => {
-      return { slug }
+    .map((doc) => {
+      const tenantSlug = typeof doc.tenant === 'object' && doc.tenant !== null ? doc.tenant.slug : 'default'
+      return {
+        tenant: tenantSlug,
+        slug: doc.slug,
+      }
     })
 
   return params
@@ -39,13 +45,14 @@ export async function generateStaticParams() {
 
 type Args = {
   params: Promise<{
+    tenant: string
     slug?: string
   }>
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { slug = 'home' } = await paramsPromise
+  const { slug = 'home', tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
@@ -53,6 +60,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   page = await queryPageBySlug({
     slug: decodedSlug,
+    tenant,
   })
 
   // Remove this code once your website is seeded
@@ -81,21 +89,37 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = 'home' } = await paramsPromise
+  const { slug = 'home', tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const page = await queryPageBySlug({
     slug: decodedSlug,
+    tenant,
   })
 
   return generateMeta({ doc: page })
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: string }) => {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
 
+  // 1. Resolve tenant ID
+  const tenantDoc = await payload.find({
+    collection: 'tenants',
+    where: {
+      or: [
+        { slug: { equals: tenant } },
+        { domain: { equals: tenant } },
+      ],
+    },
+    limit: 1,
+  })
+
+  const tenantId = tenantDoc.docs[0]?.id
+
+  // 2. Query page matching slug and tenant ID
   const result = await payload.find({
     collection: 'pages',
     draft,
@@ -103,9 +127,10 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
     pagination: false,
     overrideAccess: draft,
     where: {
-      slug: {
-        equals: slug,
-      },
+      and: [
+        { slug: { equals: slug } },
+        ...(tenantId ? [{ tenant: { equals: tenantId } }] : []),
+      ],
     },
   })
 

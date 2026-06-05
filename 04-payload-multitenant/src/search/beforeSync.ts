@@ -5,9 +5,9 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
     doc: { relationTo: collection },
   } = searchDoc
 
-  const { slug, id, categories, title, meta } = originalDoc
+  const { slug, id, categories, title, meta, tenant } = originalDoc
 
-  const modifiedDoc: DocToSync = {
+  const modifiedDoc: DocToSync & { tenant?: any } = {
     ...searchDoc,
     slug,
     meta: {
@@ -17,6 +17,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
       description: meta?.description,
     },
     categories: [],
+    tenant: typeof tenant === 'object' && tenant !== null ? tenant.id : tenant,
   }
 
   if (categories && Array.isArray(categories) && categories.length > 0) {

@@ -1,4 +1,4 @@
-import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import type { CollectionSlug, Payload, PayloadRequest, File } from 'payload'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
@@ -18,9 +18,10 @@ const collections: CollectionSlug[] = [
   'forms',
   'form-submissions',
   'search',
+  'tenants',
+  'header',
+  'footer',
 ]
-
-const globals: GlobalSlug[] = ['header', 'footer']
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
@@ -44,19 +45,25 @@ export const seed = async ({
   payload.logger.info(`— Clearing collections and globals...`)
 
   // clear the database
+
+  // 1. Clear user-tenant associations first to prevent foreign key violations in users_tenants
+  const allUsers = await payload.find({
+    collection: 'users',
+    limit: 1000,
+    req,
+  })
+
   await Promise.all(
-    globals.map((global) =>
-      payload.updateGlobal({
-        slug: global,
+    allUsers.docs.map((user) =>
+      payload.update({
+        collection: 'users',
+        id: user.id,
         data: {
-          navItems: [],
+          tenants: [],
         },
-        depth: 0,
-        context: {
-          disableRevalidate: true,
-        },
-      }),
-    ),
+        req,
+      })
+    )
   )
 
   await Promise.all(
@@ -98,6 +105,31 @@ export const seed = async ({
     ),
   ])
 
+  // First create a default tenant so header, footer, and users can be linked to it
+  const defaultTenant = await payload.create({
+    collection: 'tenants',
+    data: {
+      name: 'Default Tenant',
+      slug: 'default',
+    },
+  })
+
+  // Link the active admin user (running the seed) to the default tenant
+  if (req.user) {
+    await payload.update({
+      collection: 'users',
+      id: req.user.id,
+      data: {
+        tenants: [
+          {
+            tenant: defaultTenant.id,
+          },
+        ],
+      },
+      req,
+    })
+  }
+
   const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
     payload.create({
       collection: 'users',
@@ -105,26 +137,43 @@ export const seed = async ({
         name: 'Demo Author',
         email: 'demo-author@example.com',
         password: 'password',
+        tenants: [
+          {
+            tenant: defaultTenant.id,
+          },
+        ],
       },
     }),
     payload.create({
       collection: 'media',
-      data: image1,
+      data: {
+        ...image1,
+        tenant: defaultTenant.id,
+      },
       file: image1Buffer,
     }),
     payload.create({
       collection: 'media',
-      data: image2,
+      data: {
+        ...image2,
+        tenant: defaultTenant.id,
+      },
       file: image2Buffer,
     }),
     payload.create({
       collection: 'media',
-      data: image2,
+      data: {
+        ...image2,
+        tenant: defaultTenant.id,
+      },
       file: image3Buffer,
     }),
     payload.create({
       collection: 'media',
-      data: imageHero1,
+      data: {
+        ...imageHero1,
+        tenant: defaultTenant.id,
+      },
       file: hero1Buffer,
     }),
     categories.map((category) =>
@@ -148,7 +197,10 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: {
+      ...post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+      tenant: defaultTenant.id,
+    },
   })
 
   const post2Doc = await payload.create({
@@ -157,7 +209,10 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: {
+      ...post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+      tenant: defaultTenant.id,
+    },
   })
 
   const post3Doc = await payload.create({
@@ -166,7 +221,10 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    data: {
+      ...post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+      tenant: defaultTenant.id,
+    },
   })
 
   // update each post with related posts
@@ -206,21 +264,28 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      data: {
+        ...home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+        tenant: defaultTenant.id,
+      },
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: contactPageData({ contactForm: contactForm }),
+      data: {
+        ...contactPageData({ contactForm: contactForm }),
+        tenant: defaultTenant.id,
+      },
     }),
   ])
 
-  payload.logger.info(`— Seeding globals...`)
+  payload.logger.info(`— Seeding header and footer collections...`)
 
   await Promise.all([
-    payload.updateGlobal({
-      slug: 'header',
+    payload.create({
+      collection: 'header',
       data: {
+        tenant: defaultTenant.id,
         navItems: [
           {
             link: {
@@ -242,9 +307,10 @@ export const seed = async ({
         ],
       },
     }),
-    payload.updateGlobal({
-      slug: 'footer',
+    payload.create({
+      collection: 'footer',
       data: {
+        tenant: defaultTenant.id,
         navItems: [
           {
             link: {
