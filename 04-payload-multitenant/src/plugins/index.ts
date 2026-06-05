@@ -108,6 +108,7 @@ export const plugins: Plugin[] = [
         isGlobal: true,
       },
     },
+    useTenantsListFilter: false,
     // only super-admin has access to all tenants
     userHasAccessToAllTenants: (user) => {
       // in the future by role
