@@ -117,7 +117,9 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
-    slugField(),
+    slugField({
+      disableUnique: true,
+    }),
   ],
   hooks: {
     afterChange: [revalidatePage],

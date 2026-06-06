@@ -7,6 +7,8 @@ import RichText from '@/components/RichText'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
 
+import { getTenantId } from '@/utilities/getGlobals'
+
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
@@ -20,25 +22,26 @@ export const ArchiveBlock: React.FC<
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
+    const tenantId = await getTenantId()
 
     const flattenedCategories = categories?.map((category) => {
       if (typeof category === 'object') return category.id
       else return category
     })
 
+    const andConditions: any[] = []
+    if (tenantId) {
+      andConditions.push({ tenant: { equals: tenantId } })
+    }
+    if (flattenedCategories && flattenedCategories.length > 0) {
+      andConditions.push({ categories: { in: flattenedCategories } })
+    }
+
     const fetchedPosts = await payload.find({
       collection: 'posts',
       depth: 1,
       limit,
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
-              },
-            },
-          }
-        : {}),
+      where: andConditions.length > 0 ? { and: andConditions } : undefined,
     })
 
     posts = fetchedPosts.docs

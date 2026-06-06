@@ -236,6 +236,10 @@ export interface Tenant {
    * Custom domain mapped to this tenant (e.g., "tenant-a.com").
    */
   domain?: string | null;
+  /**
+   * Visual template layout for this tenant.
+   */
+  template?: ('light' | 'dark') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1477,6 +1481,7 @@ export interface TenantsSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   domain?: T;
+  template?: T;
   updatedAt?: T;
   createdAt?: T;
 }

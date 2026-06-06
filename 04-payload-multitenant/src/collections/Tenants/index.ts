@@ -36,5 +36,17 @@ export const Tenants: CollectionConfig = {
         description: 'Custom domain mapped to this tenant (e.g., "tenant-a.com").',
       },
     },
+    {
+      name: 'template',
+      type: 'select',
+      defaultValue: 'light',
+      options: [
+        { label: 'Light Theme', value: 'light' },
+        { label: 'Dark Theme', value: 'dark' },
+      ],
+      admin: {
+        description: 'Visual template layout for this tenant.',
+      },
+    },
   ],
 }
