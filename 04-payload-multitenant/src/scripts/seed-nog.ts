@@ -1,3 +1,8 @@
+/**
+ * How to run this script:
+ * pnpm tsx src/scripts/seed-nog.ts
+ */
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -96,6 +101,15 @@ async function run() {
   const payload = await getPayload({ config })
 
   payload.logger.info('Initializing Seeding for NOG (North Of Grand)...')
+
+  // Clean up existing NOG admin user if they exist
+  const nogAdminEmail = process.env.TENANT_NOG_USERNAME || 'admin@nog.blockvibe.org'
+  await payload.delete({
+    collection: 'users',
+    where: {
+      email: { equals: nogAdminEmail },
+    },
+  })
 
   // 1. Clean up existing NOG Tenant data
   const existingTenant = await payload.find({
@@ -201,20 +215,43 @@ async function run() {
     },
   })
 
-  // 4. Update Users' tenant mappings to allow access in admin UI
-  const allUsers = await payload.find({
+  // 4. Create tenant-specific admin user & link superadmin
+  const nogAdminPassword = process.env.TENANT_NOG_PASSWORD || 'password1234'
+
+  payload.logger.info(`Creating NOG Admin User: ${nogAdminEmail}`)
+  await payload.create({
     collection: 'users',
-    limit: 100,
+    data: {
+      name: 'NOG Admin',
+      email: nogAdminEmail,
+      password: nogAdminPassword,
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
   })
 
-  for (const user of allUsers.docs) {
-    const currentTenantIds = (user.tenants || [])
+  const superAdminEmail = process.env.LOCAL_SUPERADMIN_USERNAME || 'eugen8@gmail.com'
+  const superAdminUsers = await payload.find({
+    collection: 'users',
+    where: {
+      email: { equals: superAdminEmail },
+    },
+    limit: 1,
+  })
+
+  if (superAdminUsers.docs.length > 0) {
+    const superAdmin = superAdminUsers.docs[0]
+    const currentTenantIds = (superAdmin.tenants || [])
       .map((t: any) => (typeof t.tenant === 'object' && t.tenant !== null ? t.tenant.id : t.tenant))
       .filter((id) => id !== tenant.id)
 
+    payload.logger.info(`Mapping Superadmin to NOG Tenant`)
     await payload.update({
       collection: 'users',
-      id: user.id,
+      id: superAdmin.id,
       data: {
         tenants: [
           ...currentTenantIds.map((id) => ({ tenant: id })),
@@ -223,6 +260,7 @@ async function run() {
       },
     })
   }
+
 
   // 5. Create media items in Payload
   payload.logger.info('Uploading media items...')
@@ -295,12 +333,12 @@ async function run() {
           columns: [
             {
               type: 'media',
-              size: 'half',
+              size: 'oneThird',
               media: homePhotoDoc.id,
             },
             {
               type: 'text',
-              size: 'half',
+              size: 'twoThirds',
               richText: lexicalRichText([
                 richParagraph('Welcome to the Historic District of North of Grand. The neighborhood is nestled in the heart of Des Moines, Iowa between 31st & 42nd street from Hwy 235 to Grand Ave.'),
                 richHeading('North of Grand Neighborhood Association'),

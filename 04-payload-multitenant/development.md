@@ -82,11 +82,15 @@ If you need to seed or reset the database with tenant-specific layout configurat
 
 * **Seed North of Grand (NOG):**
   ```bash
-  npx tsx src/scripts/seed-nog.ts
+  pnpm tsx src/scripts/seed-nog.ts
   ```
 * **Seed Beaverdale:**
   ```bash
-  npx tsx src/scripts/seed-beaverdale.ts
+  pnpm tsx src/scripts/seed-beaverdale.ts
+  ```
+* **Global Database Seed (Default Tenant, posts, pages):**
+  ```bash
+  pnpm tsx src/scripts/test-seed.ts
   ```
 
 ---

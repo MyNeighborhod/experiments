@@ -75,11 +75,15 @@ async function getGlobal(slug: 'header' | 'footer', tenantId: string | number | 
 /**
  * Returns a unstable_cache function mapped with the cache tag for the slug and tenant
  */
-export const getCachedGlobal = (slug: 'header' | 'footer', tenantId: string | number | null, depth = 0) =>
-  unstable_cache(
+export const getCachedGlobal = (slug: 'header' | 'footer', tenantId: string | number | null, depth = 0) => {
+  // if (process.env.NODE_ENV === 'development') {
+  //   return async () => getGlobal(slug, tenantId, depth)
+  // }
+  return unstable_cache(
     async () => getGlobal(slug, tenantId, depth),
     [slug, String(tenantId || 'default')],
     {
       tags: [`global_${slug}`, `tenant_${tenantId || 'default'}`],
     }
   )
+}

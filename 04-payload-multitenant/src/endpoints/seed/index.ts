@@ -66,15 +66,15 @@ export const seed = async ({
     )
   )
 
-  await Promise.all(
-    collections.map((collection) => payload.db.deleteMany({ collection, req, where: {} })),
-  )
+  for (const collection of collections) {
+    await payload.db.deleteMany({ collection, req, where: {} })
+  }
 
-  await Promise.all(
-    collections
-      .filter((collection) => Boolean(payload.collections[collection].config.versions))
-      .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
-  )
+  for (const collection of collections) {
+    if (Boolean(payload.collections[collection]?.config?.versions)) {
+      await payload.db.deleteVersions({ collection, req, where: {} })
+    }
+  }
 
   payload.logger.info(`— Seeding demo author and user...`)
 
@@ -231,6 +231,9 @@ export const seed = async ({
   await payload.update({
     id: post1Doc.id,
     collection: 'posts',
+    context: {
+      disableRevalidate: true,
+    },
     data: {
       relatedPosts: [post2Doc.id, post3Doc.id],
     },
@@ -238,6 +241,9 @@ export const seed = async ({
   await payload.update({
     id: post2Doc.id,
     collection: 'posts',
+    context: {
+      disableRevalidate: true,
+    },
     data: {
       relatedPosts: [post1Doc.id, post3Doc.id],
     },
@@ -245,6 +251,9 @@ export const seed = async ({
   await payload.update({
     id: post3Doc.id,
     collection: 'posts',
+    context: {
+      disableRevalidate: true,
+    },
     data: {
       relatedPosts: [post1Doc.id, post2Doc.id],
     },

@@ -4,9 +4,13 @@ import { revalidateTag } from 'next/cache'
 
 export const revalidateHeader: CollectionAfterChangeHook = ({ doc, req: { payload, context } }) => {
   if (!context.disableRevalidate) {
-    payload.logger.info(`Revalidating header`)
+    try {
+      payload.logger.info(`Revalidating header`)
 
-    revalidateTag('global_header', 'max')
+      revalidateTag('global_header', 'max')
+    } catch (err) {
+      payload.logger.error({ err, message: `Error revalidating header` })
+    }
   }
 
   return doc

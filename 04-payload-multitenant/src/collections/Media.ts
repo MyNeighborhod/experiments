@@ -76,7 +76,14 @@ const afterChangeHook: CollectionAfterChangeHook = async ({ doc, req, operation 
   return doc
 }
 
-const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ doc, req }) => {
+const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const doc = await req.payload.findByID({
+    collection: 'media',
+    id,
+    req,
+  })
+  if (!doc) return
+
   let slug = 'global'
   if (doc.tenant) {
     const tenantId = typeof doc.tenant === 'object' ? doc.tenant.id : doc.tenant
@@ -97,11 +104,14 @@ const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ doc, req }) => {
   // Delete sizes
   if (doc.sizes) {
     for (const sizeKey of Object.keys(doc.sizes)) {
-      const sizeFilename = doc.sizes[sizeKey]?.filename
-      if (sizeFilename) {
-        const filePath = path.join(destDir, sizeFilename)
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath)
+      const sizeObj = (doc.sizes as Record<string, unknown>)[sizeKey]
+      if (sizeObj && typeof sizeObj === 'object' && 'filename' in sizeObj) {
+        const sizeFilename = (sizeObj as { filename?: string | null }).filename
+        if (sizeFilename) {
+          const filePath = path.join(destDir, sizeFilename)
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath)
+          }
         }
       }
     }

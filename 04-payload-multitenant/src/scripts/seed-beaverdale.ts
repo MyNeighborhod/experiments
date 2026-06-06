@@ -1,3 +1,8 @@
+/**
+ * How to run this script:
+ * pnpm tsx src/scripts/seed-beaverdale.ts
+ */
+
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -26,6 +31,15 @@ async function run() {
   const payload = await getPayload({ config })
 
   payload.logger.info('Initializing Seeding for Beaverdale...')
+
+  // Clean up existing Beaverdale admin user if they exist
+  const beaverdaleAdminEmail = process.env.TENANT_BEAVERDALE_USERNAME || 'admin@beaverdale.blockvibe.org'
+  await payload.delete({
+    collection: 'users',
+    where: {
+      email: { equals: beaverdaleAdminEmail },
+    },
+  })
 
   // 1. Clean up existing Beaverdale Tenant data
   const existingTenant = await payload.find({
@@ -118,20 +132,43 @@ async function run() {
     },
   })
 
-  // 4. Update Users' tenant mappings to allow access in admin UI
-  const allUsers = await payload.find({
+  // 4. Create tenant-specific admin user & link superadmin
+  const beaverdaleAdminPassword = process.env.TENANT_BEAVERDALE_PASSWORD || 'password1234'
+
+  payload.logger.info(`Creating Beaverdale Admin User: ${beaverdaleAdminEmail}`)
+  const beaverdaleAdminUser = await payload.create({
     collection: 'users',
-    limit: 100,
+    data: {
+      name: 'Beaverdale Admin',
+      email: beaverdaleAdminEmail,
+      password: beaverdaleAdminPassword,
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
   })
 
-  for (const user of allUsers.docs) {
-    const currentTenantIds = (user.tenants || [])
+  const superAdminEmail = process.env.LOCAL_SUPERADMIN_USERNAME || 'eugen8@gmail.com'
+  const superAdminUsers = await payload.find({
+    collection: 'users',
+    where: {
+      email: { equals: superAdminEmail },
+    },
+    limit: 1,
+  })
+
+  if (superAdminUsers.docs.length > 0) {
+    const superAdmin = superAdminUsers.docs[0]
+    const currentTenantIds = (superAdmin.tenants || [])
       .map((t: any) => (typeof t.tenant === 'object' && t.tenant !== null ? t.tenant.id : t.tenant))
       .filter((id) => id !== tenant.id)
 
+    payload.logger.info(`Mapping Superadmin to Beaverdale Tenant`)
     await payload.update({
       collection: 'users',
-      id: user.id,
+      id: superAdmin.id,
       data: {
         tenants: [
           ...currentTenantIds.map((id) => ({ tenant: id })),
@@ -140,6 +177,7 @@ async function run() {
       },
     })
   }
+
 
   // Find or create global contact form
   const formsResult = await payload.find({
@@ -171,7 +209,7 @@ async function run() {
   ])
 
   // Create post
-  const postData = post2({ heroImage: mediaImage, blockImage: mediaImage, author: allUsers.docs[0] })
+  const postData = post2({ heroImage: mediaImage, blockImage: mediaImage, author: beaverdaleAdminUser })
   await payload.create({
     collection: 'posts',
     depth: 0,
