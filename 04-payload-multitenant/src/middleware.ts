@@ -21,17 +21,23 @@ export function middleware(request: NextRequest) {
   const hostname = host.split(':')[0] // remove port if present
 
   // 3. Resolve tenant slug (fallback to 'default')
+  const platformDomain = 'blockvibe.org'
   let tenantSlug = 'default'
 
-  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-    const parts = hostname.split('.')
-    // If it's a subdomain (e.g. tenant-a.localhost or tenant-a.myplatform.com)
-    if (parts.length > 1 && parts[parts.length - 1] === 'localhost') {
-      tenantSlug = parts[0]
-    } else {
-      // For custom domains or other subdomains, use the first subdomain or full hostname
-      tenantSlug = parts[0]
-    }
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    tenantSlug = 'default'
+  } else if (hostname.endsWith('.localhost')) {
+    // Local subdomain: e.g. nog.localhost -> "nog"
+    tenantSlug = hostname.split('.')[0]
+  } else if (hostname === `info.${platformDomain}` || hostname === platformDomain) {
+    // Platform home/default site: info.blockvibe.org -> "default"
+    tenantSlug = 'default'
+  } else if (hostname.endsWith(`.${platformDomain}`)) {
+    // Platform subdomain: e.g. nog.blockvibe.org -> "nog" (matches tenant slug)
+    tenantSlug = hostname.replace(`.${platformDomain}`, '')
+  } else {
+    // Fully custom domain: e.g. www.northofgranddsm.org -> "www.northofgranddsm.org" (matches tenant domain field)
+    tenantSlug = hostname
   }
 
   // 4. Rewrite the URL internally to include the tenant slug
