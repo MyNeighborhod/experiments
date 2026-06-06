@@ -31,6 +31,34 @@ export async function getTenantId(): Promise<string | number | null> {
   return null
 }
 
+export async function getTenant(): Promise<any | null> {
+  try {
+    const host = (await headers()).get('host') || ''
+    const hostname = host.split(':')[0] // remove port if present
+
+    const payload = await getPayload({ config: configPromise })
+
+    const tenants = await payload.find({
+      collection: 'tenants',
+      where: {
+        or: [
+          { domain: { equals: hostname } },
+          { slug: { equals: hostname.split('.')[0] } },
+        ],
+      },
+      limit: 1,
+    })
+
+    if (tenants.docs.length > 0) {
+      return tenants.docs[0]
+    }
+  } catch (error) {
+    // headers() can throw during build/static page generation
+  }
+
+  return null
+}
+
 async function getGlobal(slug: 'header' | 'footer', tenantId: string | number | null, depth = 0) {
   const payload = await getPayload({ config: configPromise })
 

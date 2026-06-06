@@ -10,6 +10,14 @@ export const Footer: CollectionConfig = {
   },
   fields: [
     {
+      name: 'logoImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Upload a custom logo/wordmark image for this tenant footer.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [

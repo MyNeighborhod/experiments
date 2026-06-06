@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { cn } from '@/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
+import { Playfair_Display, Gentium_Book_Plus, Montserrat } from 'next/font/google'
 import React from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
@@ -12,21 +13,52 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
+import { getTenant } from '@/utilities/getGlobals'
 
 import '../globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
 
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  weight: ['400', '600', '700'],
+})
+
+const gentium = Gentium_Book_Plus({
+  subsets: ['latin'],
+  variable: '--font-gentium',
+  weight: ['400', '700'],
+})
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  weight: ['400', '500', '700'],
+})
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
+  const tenant = await getTenant()
+  const isNog = tenant?.slug === 'nog'
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn(
+        GeistSans.variable,
+        GeistMono.variable,
+        playfair.variable,
+        gentium.variable,
+        montserrat.variable,
+      )}
+      lang="en"
+      suppressHydrationWarning
+    >
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
-      <body>
+      <body className={cn(isNog ? 'theme-nog' : '')}>
         <Providers>
           <AdminBar
             adminBarProps={{

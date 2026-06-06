@@ -1,4 +1,4 @@
-import { getCachedGlobal, getTenantId } from '@/utilities/getGlobals'
+import { getCachedGlobal, getTenantId, getTenant } from '@/utilities/getGlobals'
 import Link from 'next/link'
 import React from 'react'
 
@@ -8,9 +8,36 @@ import { Logo } from '@/components/Logo/Logo'
 
 export async function Footer() {
   const tenantId = await getTenantId()
+  const tenant = await getTenant()
   const footerData = await getCachedGlobal('footer', tenantId, 1)()
 
   const navItems = footerData?.navItems || []
+  const isNog = tenant?.slug === 'nog'
+  const logoImage = (footerData as any)?.logoImage
+  const logoUrl = logoImage && typeof logoImage === 'object' ? logoImage.url : null
+
+  if (isNog) {
+    return (
+      <footer className="mt-auto border-t border-border bg-white text-gray-700 py-12">
+        <div className="container flex flex-col items-center gap-6">
+          {logoUrl && (
+            <div className="mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl} alt="North Of Grand Wordmark" className="max-h-14 w-auto object-contain mx-auto" />
+            </div>
+          )}
+          <nav className="flex flex-wrap justify-center gap-6 text-sm">
+            {navItems.map(({ link }, i) => {
+              return <CMSLink className="text-[#0a3840] hover:text-[#47773e] font-medium transition-colors" key={i} {...link} />
+            })}
+          </nav>
+          <div className="text-xs text-gray-400 mt-4 text-center">
+            &copy; {new Date().getFullYear()} North Of Grand Neighborhood Association. All Rights Reserved.
+          </div>
+        </div>
+      </footer>
+    )
+  }
 
   return (
     <footer className="mt-auto border-t border-border bg-black dark:bg-card text-white">

@@ -821,6 +821,10 @@ export interface Form {
 export interface Header {
   id: number;
   tenant?: (number | null) | Tenant;
+  /**
+   * Upload a custom logo image for this tenant header. If not provided, a default logo or text will be used.
+   */
+  logoImage?: (number | null) | Media;
   navItems?:
     | {
         link: {
@@ -851,6 +855,10 @@ export interface Header {
 export interface Footer {
   id: number;
   tenant?: (number | null) | Tenant;
+  /**
+   * Upload a custom logo/wordmark image for this tenant footer.
+   */
+  logoImage?: (number | null) | Media;
   navItems?:
     | {
         link: {
@@ -1491,6 +1499,7 @@ export interface TenantsSelect<T extends boolean = true> {
  */
 export interface HeaderSelect<T extends boolean = true> {
   tenant?: T;
+  logoImage?: T;
   navItems?:
     | T
     | {
@@ -1514,6 +1523,7 @@ export interface HeaderSelect<T extends boolean = true> {
  */
 export interface FooterSelect<T extends boolean = true> {
   tenant?: T;
+  logoImage?: T;
   navItems?:
     | T
     | {

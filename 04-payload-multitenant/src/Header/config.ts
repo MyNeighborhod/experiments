@@ -10,6 +10,14 @@ export const Header: CollectionConfig = {
   },
   fields: [
     {
+      name: 'logoImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Upload a custom logo image for this tenant header. If not provided, a default logo or text will be used.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [
