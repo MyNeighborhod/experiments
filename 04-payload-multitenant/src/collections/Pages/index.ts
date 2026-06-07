@@ -1,11 +1,6 @@
 import type { CollectionConfig } from "payload"
 
-import {
-  pagesRead,
-  pagesCreate,
-  pagesUpdate,
-  pagesDelete,
-} from "../../access/roles"
+import { pagesRead, pagesCreate, pagesUpdate, pagesDelete } from "../../access/roles"
 import { Archive } from "../../blocks/ArchiveBlock/config"
 import { CallToAction } from "../../blocks/CallToAction/config"
 import { Content } from "../../blocks/Content/config"

@@ -12,13 +12,12 @@ import { Header } from "@/Header/Component"
 import { Providers } from "@/providers"
 import { InitTheme } from "@/providers/Theme/InitTheme"
 import { mergeOpenGraph } from "@/utilities/mergeOpenGraph"
-import { draftMode } from "next/headers"
+import { draftMode, headers } from "next/headers"
 import { getTenant } from "@/utilities/getGlobals"
 
 import "../globals.css"
 import { notFound } from "next/navigation"
 import { getServerSideURL } from "@/utilities/getURL"
-import { hostname } from "os"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -50,10 +49,9 @@ export default async function RootLayout({
   const tenant = await getTenant()
 
   // Trigger 404 if the requested tenant does not exist in the database (ignoring default fallback)
+
   if (tenantSlug !== "default" && !tenant) {
-    if(hostname() !== "localhost") {
-      return notFound()
-    }
+    return notFound()
   }
 
   const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ""

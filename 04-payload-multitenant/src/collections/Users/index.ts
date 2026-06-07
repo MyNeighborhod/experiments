@@ -1,12 +1,6 @@
 import type { CollectionConfig } from "payload"
 
-import {
-  isApproved,
-  usersRead,
-  usersCreate,
-  usersUpdate,
-  usersDelete,
-} from "../../access/roles"
+import { isApproved, usersRead, usersCreate, usersUpdate, usersDelete } from "../../access/roles"
 import { usersBeforeChangeHook } from "./beforeChange"
 
 export const Users: CollectionConfig = {

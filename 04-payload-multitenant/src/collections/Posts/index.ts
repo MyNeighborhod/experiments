@@ -9,12 +9,7 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical"
 
-import {
-  postsRead,
-  postsCreate,
-  postsUpdate,
-  postsDelete,
-} from "../../access/roles"
+import { postsRead, postsCreate, postsUpdate, postsDelete } from "../../access/roles"
 import { Banner } from "../../blocks/Banner/config"
 import { Code } from "../../blocks/Code/config"
 import { MediaBlock } from "../../blocks/MediaBlock/config"
@@ -206,9 +201,7 @@ export const Posts: CollectionConfig<"posts"> = {
       filterOptions: ({ siblingData }): any => {
         const data = siblingData as any
         const tenantId =
-          typeof data?.tenant === "object" && data?.tenant !== null
-            ? data.tenant.id
-            : data?.tenant
+          typeof data?.tenant === "object" && data?.tenant !== null ? data.tenant.id : data?.tenant
         if (!tenantId) return {} as any
         return {
           "tenants.tenant": {

@@ -15,11 +15,7 @@ import { fileURLToPath } from "url"
 import fs from "fs"
 
 import { anyone } from "../access/anyone"
-import {
-  mediaCreate,
-  mediaUpdate,
-  mediaDelete,
-} from "../access/roles"
+import { mediaCreate, mediaUpdate, mediaDelete } from "../access/roles"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -128,7 +124,6 @@ const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
 }
 
 const afterReadHook: CollectionAfterReadHook = async ({ doc, req }) => {
-  console.log("afterReadHook called for", doc.filename)
   let slug = "global"
   if (doc.tenant) {
     const tenantId = typeof doc.tenant === "object" ? doc.tenant.id : doc.tenant

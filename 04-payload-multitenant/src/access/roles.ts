@@ -23,7 +23,7 @@ export const getUserTenantIds = (user: User | null | undefined): number[] => {
 export const usersRead: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     if ((user as any)?.role === "admin") {
       const tenantIds = getUserTenantIds(user)
@@ -41,7 +41,7 @@ export const usersRead: Access = ({ req: { user } }) => {
       },
     } as any
   }
-  
+
   return false
 }
 
@@ -53,7 +53,7 @@ export const usersCreate: Access = ({ req: { user } }) => {
 export const usersUpdate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     if ((user as any)?.role === "admin") {
       const tenantIds = getUserTenantIds(user)
@@ -80,14 +80,14 @@ export const usersUpdate: Access = ({ req: { user } }) => {
       },
     } as any
   }
-  
+
   return false
 }
 
 export const usersDelete: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user) && (user as any)?.role === "admin") {
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return false
@@ -106,7 +106,7 @@ export const usersDelete: Access = ({ req: { user } }) => {
       ],
     } as any
   }
-  
+
   return false
 }
 
@@ -120,10 +120,10 @@ export const pagesRead: Access = ({ req: { user } }) => {
       equals: "published",
     },
   }
-  
+
   if (!user) return publishedConstraint as any
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return publishedConstraint as any
@@ -138,14 +138,14 @@ export const pagesRead: Access = ({ req: { user } }) => {
       ],
     } as any
   }
-  
+
   return publishedConstraint as any
 }
 
 export const pagesCreate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     if (role === "admin" || role === "editor") {
@@ -153,14 +153,14 @@ export const pagesCreate: Access = ({ req: { user } }) => {
       return tenantIds.length > 0
     }
   }
-  
+
   return false
 }
 
 export const pagesUpdate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     if (role === "admin" || role === "editor") {
@@ -173,14 +173,14 @@ export const pagesUpdate: Access = ({ req: { user } }) => {
       } as any
     }
   }
-  
+
   return false
 }
 
 export const pagesDelete: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     if (role === "admin" || role === "editor") {
@@ -193,7 +193,7 @@ export const pagesDelete: Access = ({ req: { user } }) => {
       } as any
     }
   }
-  
+
   return false
 }
 
@@ -207,10 +207,10 @@ export const postsRead: Access = ({ req: { user } }) => {
       equals: "published",
     },
   }
-  
+
   if (!user) return publishedConstraint as any
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return publishedConstraint as any
@@ -225,30 +225,30 @@ export const postsRead: Access = ({ req: { user } }) => {
       ],
     } as any
   }
-  
+
   return publishedConstraint as any
 }
 
 export const postsCreate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     return getUserTenantIds(user).length > 0
   }
-  
+
   return false
 }
 
 export const postsUpdate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return false
-    
+
     if (role === "admin" || role === "editor") {
       return {
         tenant: {
@@ -256,7 +256,7 @@ export const postsUpdate: Access = ({ req: { user } }) => {
         },
       } as any
     }
-    
+
     if (role === "contributor") {
       return {
         and: [
@@ -283,19 +283,19 @@ export const postsUpdate: Access = ({ req: { user } }) => {
       } as any
     }
   }
-  
+
   return false
 }
 
 export const postsDelete: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return false
-    
+
     if (role === "admin" || role === "editor") {
       return {
         tenant: {
@@ -303,7 +303,7 @@ export const postsDelete: Access = ({ req: { user } }) => {
         },
       } as any
     }
-    
+
     if (role === "contributor") {
       return {
         and: [
@@ -321,7 +321,7 @@ export const postsDelete: Access = ({ req: { user } }) => {
       } as any
     }
   }
-  
+
   return false
 }
 
@@ -332,18 +332,18 @@ export const postsDelete: Access = ({ req: { user } }) => {
 export const mediaCreate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     return getUserTenantIds(user).length > 0
   }
-  
+
   return false
 }
 
 export const mediaUpdate: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const tenantIds = getUserTenantIds(user)
     if (tenantIds.length === 0) return false
@@ -353,14 +353,14 @@ export const mediaUpdate: Access = ({ req: { user } }) => {
       },
     } as any
   }
-  
+
   return false
 }
 
 export const mediaDelete: Access = ({ req: { user } }) => {
   if (!user) return false
   if (isSuperAdmin(user)) return true
-  
+
   if (isApproved(user)) {
     const role = (user as any)?.role
     if (role === "admin" || role === "editor") {
@@ -373,6 +373,6 @@ export const mediaDelete: Access = ({ req: { user } }) => {
       } as any
     }
   }
-  
+
   return false
 }
