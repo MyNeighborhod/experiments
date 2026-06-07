@@ -16,7 +16,9 @@ import { draftMode } from "next/headers"
 import { getTenant } from "@/utilities/getGlobals"
 
 import "../globals.css"
+import { notFound } from "next/navigation"
 import { getServerSideURL } from "@/utilities/getURL"
+import { hostname } from "os"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -36,9 +38,24 @@ const montserrat = Montserrat({
   weight: ["400", "500", "700"],
 })
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ tenant: string }>
+}) {
+  const { tenant: tenantSlug } = await params
   const { isEnabled } = await draftMode()
   const tenant = await getTenant()
+
+  // Trigger 404 if the requested tenant does not exist in the database (ignoring default fallback)
+  if (tenantSlug !== "default" && !tenant) {
+    if(hostname() !== "localhost") {
+      return notFound()
+    }
+  }
+
   const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ""
 
   return (

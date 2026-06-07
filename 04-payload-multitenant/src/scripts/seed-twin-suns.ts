@@ -279,13 +279,88 @@ async function run() {
   // 4. Create tenant-specific admin user & link superadmin
   const twinSunsAdminPassword = process.env.TENANT_TWIN_SUNS_PASSWORD || "oasis1234"
 
-  payload.logger.info(`Creating Twin Suns Admin User: ${twinSunsAdminEmail}`)
+  payload.logger.info(`Creating/Recreating Twin Suns Admin User: ${twinSunsAdminEmail}`)
   const adminUser = await payload.create({
     collection: "users",
+    context: { isSeeding: true },
     data: {
       name: "Twin Suns Admin",
       email: twinSunsAdminEmail,
       password: twinSunsAdminPassword,
+      role: "admin",
+      status: "approved",
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
+  })
+
+  // Create Editor
+  const twinSunsEditorEmail = "editor@twin-suns.blockvibe.org"
+  await payload.delete({
+    collection: "users",
+    where: { email: { equals: twinSunsEditorEmail } },
+  })
+  payload.logger.info(`Creating Twin Suns Editor User: ${twinSunsEditorEmail}`)
+  const editorUser = await payload.create({
+    collection: "users",
+    context: { isSeeding: true },
+    data: {
+      name: "Twin Suns Editor",
+      email: twinSunsEditorEmail,
+      password: "editor1234",
+      role: "editor",
+      status: "approved",
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
+  })
+
+  // Create Contributor (Approved)
+  const twinSunsContributorEmail = "contributor@twin-suns.blockvibe.org"
+  await payload.delete({
+    collection: "users",
+    where: { email: { equals: twinSunsContributorEmail } },
+  })
+  payload.logger.info(`Creating Twin Suns Contributor User: ${twinSunsContributorEmail}`)
+  const contributorUser = await payload.create({
+    collection: "users",
+    context: { isSeeding: true },
+    data: {
+      name: "Twin Suns Contributor",
+      email: twinSunsContributorEmail,
+      password: "contrib1234",
+      role: "contributor",
+      status: "approved",
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
+  })
+
+  // Create Staging (Pending) User
+  const twinSunsPendingEmail = "pending@twin-suns.blockvibe.org"
+  await payload.delete({
+    collection: "users",
+    where: { email: { equals: twinSunsPendingEmail } },
+  })
+  payload.logger.info(`Creating Twin Suns Pending User: ${twinSunsPendingEmail}`)
+  const pendingUser = await payload.create({
+    collection: "users",
+    context: { isSeeding: true },
+    data: {
+      name: "Twin Suns Pending Registration",
+      email: twinSunsPendingEmail,
+      password: "pending1234",
+      role: "contributor",
+      status: "pending",
       tenants: [
         {
           tenant: tenant.id,
@@ -313,8 +388,25 @@ async function run() {
     await payload.update({
       collection: "users",
       id: superAdmin.id,
+      context: { isSeeding: true },
       data: {
+        role: "superadmin",
+        status: "approved",
         tenants: [...currentTenantIds.map((id) => ({ tenant: id })), { tenant: tenant.id }],
+      },
+    })
+  } else {
+    payload.logger.info(`Creating Superadmin User: ${superAdminEmail}`)
+    await payload.create({
+      collection: "users",
+      context: { isSeeding: true },
+      data: {
+        name: "Super Admin",
+        email: superAdminEmail,
+        password: process.env.LOCAL_SUPERADMIN_PASSWORD || "admin1234",
+        role: "superadmin",
+        status: "approved",
+        tenants: [{ tenant: tenant.id }],
       },
     })
   }
@@ -699,6 +791,7 @@ async function run() {
       title: "Dune-Nomad Peace Treaty Signed",
       tenant: tenant.id,
       authors: [adminUser.id as number],
+      contributingEditors: [contributorUser.id as number],
       heroImage: postPhotoDoc.id,
       content: lexicalRichText([
         richHeading("Peace in the Canyons"),

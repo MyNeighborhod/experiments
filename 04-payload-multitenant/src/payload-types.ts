@@ -279,6 +279,10 @@ export interface Post {
   };
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
+  /**
+   * Editors or contributors assigned to help edit this post.
+   */
+  contributingEditors?: (number | User)[] | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -445,6 +449,14 @@ export interface Category {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * Access level control for user permissions.
+   */
+  role?: ('superadmin' | 'admin' | 'editor' | 'contributor') | null;
+  /**
+   * Approval status for registration staging area.
+   */
+  status?: ('pending' | 'approved' | 'rejected') | null;
   tenants?:
     | {
         tenant: number | Tenant;
@@ -1325,6 +1337,7 @@ export interface PostsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   authors?: T;
+  contributingEditors?: T;
   populatedAuthors?:
     | T
     | {
@@ -1458,6 +1471,8 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
+  status?: T;
   tenants?:
     | T
     | {

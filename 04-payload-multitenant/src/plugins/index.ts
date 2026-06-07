@@ -110,8 +110,7 @@ export const plugins: Plugin[] = [
     useTenantsListFilter: false,
     // only super-admin has access to all tenants
     userHasAccessToAllTenants: (user) => {
-      // in the future by role
-      return user?.email !== undefined && SUPER_ADMIN_EMAILS.includes(user.email)
+      return (user as any)?.role === "superadmin"
     },
     // userHasAccessToAllTenants: () => true,
   }),

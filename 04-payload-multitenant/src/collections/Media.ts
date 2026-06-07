@@ -15,7 +15,11 @@ import { fileURLToPath } from "url"
 import fs from "fs"
 
 import { anyone } from "../access/anyone"
-import { authenticated } from "../access/authenticated"
+import {
+  mediaCreate,
+  mediaUpdate,
+  mediaDelete,
+} from "../access/roles"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -151,10 +155,10 @@ export const Media: CollectionConfig = {
   slug: "media",
   folders: true,
   access: {
-    create: authenticated,
-    delete: authenticated,
+    create: mediaCreate,
+    delete: mediaDelete,
     read: anyone,
-    update: authenticated,
+    update: mediaUpdate,
   },
   hooks: {
     afterChange: [afterChangeHook],
