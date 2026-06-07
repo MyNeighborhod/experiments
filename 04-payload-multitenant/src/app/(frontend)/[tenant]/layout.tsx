@@ -39,7 +39,7 @@ const montserrat = Montserrat({
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
   const tenant = await getTenant()
-  const isNog = tenant?.slug === 'nog'
+  const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ''
 
   return (
     <html
@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
-      <body className={cn(isNog ? 'theme-nog' : '')}>
+      <body className={cn(themeClass)}>
         <Providers>
           <AdminBar
             adminBarProps={{
