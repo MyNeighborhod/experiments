@@ -9,9 +9,9 @@
  * through `remotePatterns`, which blocks private IPs since Next.js 16.
  */
 export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
-  if (!url) return ''
+  if (!url) return ""
 
-  if (cacheTag && cacheTag !== '') {
+  if (cacheTag && cacheTag !== "") {
     cacheTag = encodeURIComponent(cacheTag)
   }
 

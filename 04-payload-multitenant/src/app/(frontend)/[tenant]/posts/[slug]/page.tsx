@@ -1,24 +1,24 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
-import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
-import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
-import RichText from '@/components/RichText'
+import { RelatedPosts } from "@/blocks/RelatedPosts/Component"
+import { PayloadRedirects } from "@/components/PayloadRedirects"
+import configPromise from "@payload-config"
+import { getPayload } from "payload"
+import { draftMode } from "next/headers"
+import React, { cache } from "react"
+import RichText from "@/components/RichText"
 
-import type { Post } from '@/payload-types'
+import type { Post } from "@/payload-types"
 
-import { PostHero } from '@/heros/PostHero'
-import { generateMeta } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { PostHero } from "@/heros/PostHero"
+import { generateMeta } from "@/utilities/generateMeta"
+import PageClient from "./page.client"
+import { LivePreviewListener } from "@/components/LivePreviewListener"
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const posts = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     draft: false,
     limit: 1000,
     overrideAccess: false,
@@ -31,7 +31,8 @@ export async function generateStaticParams() {
   })
 
   const params = posts.docs.map((doc) => {
-    const tenantSlug = typeof doc.tenant === 'object' && doc.tenant !== null ? doc.tenant.slug : 'default'
+    const tenantSlug =
+      typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
     return {
       tenant: tenantSlug,
       slug: doc.slug,
@@ -50,10 +51,10 @@ type Args = {
 
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { slug = '', tenant } = await paramsPromise
+  const { slug = "", tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/posts/' + decodedSlug
+  const url = "/posts/" + decodedSlug
   const post = await queryPostBySlug({ slug: decodedSlug, tenant })
 
   if (!post) return <PayloadRedirects url={url} />
@@ -75,7 +76,7 @@ export default async function Post({ params: paramsPromise }: Args) {
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <RelatedPosts
               className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={post.relatedPosts.filter((post) => typeof post === 'object')}
+              docs={post.relatedPosts.filter((post) => typeof post === "object")}
             />
           )}
         </div>
@@ -85,7 +86,7 @@ export default async function Post({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = '', tenant } = await paramsPromise
+  const { slug = "", tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const post = await queryPostBySlug({ slug: decodedSlug, tenant })
@@ -100,12 +101,9 @@ const queryPostBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
 
   // Resolve tenant ID
   const tenantDoc = await payload.find({
-    collection: 'tenants',
+    collection: "tenants",
     where: {
-      or: [
-        { slug: { equals: tenant } },
-        { domain: { equals: tenant } },
-      ],
+      or: [{ slug: { equals: tenant } }, { domain: { equals: tenant } }],
     },
     limit: 1,
   })
@@ -113,16 +111,13 @@ const queryPostBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
   const tenantId = tenantDoc.docs[0]?.id
 
   const result = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     draft,
     limit: 1,
     overrideAccess: draft,
     pagination: false,
     where: {
-      and: [
-        { slug: { equals: slug } },
-        ...(tenantId ? [{ tenant: { equals: tenantId } }] : []),
-      ],
+      and: [{ slug: { equals: slug } }, ...(tenantId ? [{ tenant: { equals: tenantId } }] : [])],
     },
   })
 

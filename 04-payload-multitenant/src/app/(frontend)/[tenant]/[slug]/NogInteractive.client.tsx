@@ -1,7 +1,7 @@
-'use client'
+"use client"
 
-import React, { useState, useEffect } from 'react'
-import { FileText, Download, Mail, Facebook, Send, CheckCircle2 } from 'lucide-react'
+import React, { useState, useEffect } from "react"
+import { FileText, Download, Mail, Facebook, Send, CheckCircle2 } from "lucide-react"
 
 type Props = {
   pageSlug: string
@@ -9,36 +9,36 @@ type Props = {
 
 // About slides
 const ABOUT_SLIDES = [
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-architech.jpg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-art-walk.jpg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-breakdancing.jpg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-bridge.jpg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-couple.jpeg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-music-art-walk.jpg',
-  'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-night-out.jpg',
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-architech.jpg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-art-walk.jpg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-breakdancing.jpg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-bridge.jpg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-couple.jpeg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-music-art-walk.jpg",
+  "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-night-out.jpg",
 ]
 
 // Meeting Minutes files list
 const MINUTES_FILES = [
   {
-    name: '05_may_2026_nog_general_meeting_minutes.docx',
-    size: '24 KB',
-    url: 'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/05_may_2026_nog_general_meeting_minutes.docx',
+    name: "05_may_2026_nog_general_meeting_minutes.docx",
+    size: "24 KB",
+    url: "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/05_may_2026_nog_general_meeting_minutes.docx",
   },
   {
-    name: '03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx',
-    size: '2.0 MB',
-    url: 'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx',
+    name: "03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    size: "2.0 MB",
+    url: "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx",
   },
   {
-    name: '02_2026_nog_board_of_directors_meeting_minutes__1_.docx',
-    size: '55 KB',
-    url: 'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/02_2026_nog_board_of_directors_meeting_minutes__1_.docx',
+    name: "02_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    size: "55 KB",
+    url: "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/02_2026_nog_board_of_directors_meeting_minutes__1_.docx",
   },
   {
-    name: '01_2026_nog_board_of_directors_meeting_minutes__1_.docx',
-    size: '54 KB',
-    url: 'https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/01_2026_nog_board_of_directors_meeting_minutes__1_.docx',
+    name: "01_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    size: "54 KB",
+    url: "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/01_2026_nog_board_of_directors_meeting_minutes__1_.docx",
   },
 ]
 
@@ -47,7 +47,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
   const [slideIndex, setSlideIndex] = useState(0)
 
   useEffect(() => {
-    if (pageSlug !== 'about') return
+    if (pageSlug !== "about") return
     const timer = setInterval(() => {
       setSlideIndex((prev) => (prev + 1) % ABOUT_SLIDES.length)
     }, 4500)
@@ -55,15 +55,15 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
   }, [pageSlug])
 
   // 2. Form states
-  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterEmail, setNewsletterEmail] = useState("")
   const [newsletterAgreed, setNewsletterAgreed] = useState(false)
   const [newsletterSuccess, setNewsletterSuccess] = useState(false)
 
   const [contactForm, setContactForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    comment: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    comment: "",
   })
   const [contactSuccess, setContactSuccess] = useState(false)
 
@@ -81,7 +81,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
 
   // --- Render by page slug ---
 
-  if (pageSlug === 'about') {
+  if (pageSlug === "about") {
     return (
       <div className="w-full my-8">
         <div className="relative w-full h-[320px] md:h-[480px] bg-gray-100 rounded-lg overflow-hidden shadow-md">
@@ -89,7 +89,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
             <div
               key={url}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === slideIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                index === slideIndex ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -107,7 +107,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
                 key={index}
                 onClick={() => setSlideIndex(index)}
                 className={`w-3 h-3 rounded-full transition-all ${
-                  index === slideIndex ? 'bg-white scale-125' : 'bg-white/50'
+                  index === slideIndex ? "bg-white scale-125" : "bg-white/50"
                 }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -118,7 +118,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
     )
   }
 
-  if (pageSlug === 'yearly-calendar') {
+  if (pageSlug === "yearly-calendar") {
     return (
       <div className="w-full flex flex-col items-center my-8">
         <div className="w-full overflow-hidden border border-border rounded-lg shadow-md bg-white mb-6">
@@ -149,7 +149,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
     )
   }
 
-  if (pageSlug === 'archives-and-documents') {
+  if (pageSlug === "archives-and-documents") {
     return (
       <div className="w-full my-8 flex flex-col gap-8">
         {/* Minutes List */}
@@ -188,7 +188,9 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
           </h3>
           <div className="bg-teal-50 p-4 border border-teal-100 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
-              <p className="text-sm text-teal-900 font-semibold">nog_bylaws_-_proposed_march_2026.pdf</p>
+              <p className="text-sm text-teal-900 font-semibold">
+                nog_bylaws_-_proposed_march_2026.pdf
+              </p>
               <p className="text-xs text-teal-800">Proposed and updated amendments for 2026.</p>
             </div>
             <a
@@ -206,7 +208,7 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
     )
   }
 
-  if (pageSlug === 'contact') {
+  if (pageSlug === "contact") {
     return (
       <div className="w-full my-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -246,8 +248,12 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
                       onChange={(e) => setNewsletterAgreed(e.target.checked)}
                       className="mt-1"
                     />
-                    <label htmlFor="newsletterOptIn" className="text-xs text-gray-500 leading-tight">
-                      I agree to receive quarterly newsletters and neighborhood updates. <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="newsletterOptIn"
+                      className="text-xs text-gray-500 leading-tight"
+                    >
+                      I agree to receive quarterly newsletters and neighborhood updates.{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                   </div>
                   <button
@@ -267,7 +273,9 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
               {contactSuccess ? (
                 <div className="p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-3">
                   <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
-                  <p className="text-sm font-semibold">Your message was sent! We'll get back to you soon.</p>
+                  <p className="text-sm font-semibold">
+                    Your message was sent! We&apos;ll get back to you soon.
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
@@ -281,17 +289,23 @@ export const NogInteractive: React.FC<Props> = ({ pageSlug }) => {
                         required
                         placeholder="Jane"
                         value={contactForm.firstName}
-                        onChange={(e) => setContactForm({ ...contactForm, firstName: e.target.value })}
+                        onChange={(e) =>
+                          setContactForm({ ...contactForm, firstName: e.target.value })
+                        }
                         className="w-full p-2 border border-border rounded text-sm outline-none focus:ring-1 focus:ring-teal-700"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-600 mb-1">Last Name</label>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        Last Name
+                      </label>
                       <input
                         type="text"
                         placeholder="Doe"
                         value={contactForm.lastName}
-                        onChange={(e) => setContactForm({ ...contactForm, lastName: e.target.value })}
+                        onChange={(e) =>
+                          setContactForm({ ...contactForm, lastName: e.target.value })
+                        }
                         className="w-full p-2 border border-border rounded text-sm outline-none focus:ring-1 focus:ring-teal-700"
                       />
                     </div>

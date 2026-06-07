@@ -8,21 +8,21 @@ Complete reference for authentication, jobs, custom endpoints, components, plugi
 
 ```ts
 // REST API
-const response = await fetch('/api/users/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const response = await fetch("/api/users/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'password',
+    email: "user@example.com",
+    password: "password",
   }),
 })
 
 // Local API
 const result = await payload.login({
-  collection: 'users',
+  collection: "users",
   data: {
-    email: 'user@example.com',
-    password: 'password',
+    email: "user@example.com",
+    password: "password",
   },
 })
 ```
@@ -31,9 +31,9 @@ const result = await payload.login({
 
 ```ts
 await payload.forgotPassword({
-  collection: 'users',
+  collection: "users",
   data: {
-    email: 'user@example.com',
+    email: "user@example.com",
   },
 })
 ```
@@ -41,12 +41,12 @@ await payload.forgotPassword({
 ### Custom Strategy
 
 ```ts
-import type { CollectionConfig, Strategy } from 'payload'
+import type { CollectionConfig, Strategy } from "payload"
 
 const customStrategy: Strategy = {
-  name: 'custom',
+  name: "custom",
   authenticate: async ({ payload, headers }) => {
-    const token = headers.get('authorization')?.split(' ')[1]
+    const token = headers.get("authorization")?.split(" ")[1]
     if (!token) return { user: null }
 
     const user = await verifyToken(token)
@@ -55,7 +55,7 @@ const customStrategy: Strategy = {
 }
 
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
   auth: {
     strategies: [customStrategy],
   },
@@ -66,10 +66,10 @@ export const Users: CollectionConfig = {
 ### API Keys
 
 ```ts
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
 export const APIKeys: CollectionConfig = {
-  slug: 'api-keys',
+  slug: "api-keys",
   auth: {
     disableLocalStrategy: true,
     useAPIKey: true,
@@ -85,19 +85,19 @@ Offload long-running or scheduled tasks to background workers.
 ### Tasks
 
 ```ts
-import { buildConfig } from 'payload'
-import type { TaskConfig } from 'payload'
+import { buildConfig } from "payload"
+import type { TaskConfig } from "payload"
 
 export default buildConfig({
   jobs: {
     tasks: [
       {
-        slug: 'sendWelcomeEmail',
+        slug: "sendWelcomeEmail",
         inputSchema: [
-          { name: 'userEmail', type: 'text', required: true },
-          { name: 'userName', type: 'text', required: true },
+          { name: "userEmail", type: "text", required: true },
+          { name: "userName", type: "text", required: true },
         ],
-        outputSchema: [{ name: 'emailSent', type: 'checkbox', required: true }],
+        outputSchema: [{ name: "emailSent", type: "checkbox", required: true }],
         retries: 2, // Retry up to 2 times on failure
         handler: async ({ input, req }) => {
           await sendEmail({
@@ -106,7 +106,7 @@ export default buildConfig({
           })
           return { output: { emailSent: true } }
         },
-      } as TaskConfig<'sendWelcomeEmail'>,
+      } as TaskConfig<"sendWelcomeEmail">,
     ],
   },
 })
@@ -117,12 +117,12 @@ export default buildConfig({
 ```ts
 // In a hook or endpoint
 await req.payload.jobs.queue({
-  task: 'sendWelcomeEmail',
+  task: "sendWelcomeEmail",
   input: {
-    userEmail: 'user@example.com',
-    userName: 'John',
+    userEmail: "user@example.com",
+    userName: "John",
   },
-  waitUntil: new Date('2024-12-31'), // Optional: schedule for future
+  waitUntil: new Date("2024-12-31"), // Optional: schedule for future
 })
 ```
 
@@ -161,20 +161,20 @@ Add custom REST API routes to collections, globals, or root config. See [ENDPOIN
 ### Root Endpoints
 
 ```ts
-import { buildConfig } from 'payload'
-import type { Endpoint } from 'payload'
+import { buildConfig } from "payload"
+import type { Endpoint } from "payload"
 
 const helloEndpoint: Endpoint = {
-  path: '/hello',
-  method: 'get',
+  path: "/hello",
+  method: "get",
   handler: () => {
-    return Response.json({ message: 'Hello!' })
+    return Response.json({ message: "Hello!" })
   },
 }
 
 const greetEndpoint: Endpoint = {
-  path: '/greet/:name',
-  method: 'get',
+  path: "/greet/:name",
+  method: "get",
   handler: (req) => {
     return Response.json({
       message: `Hello ${req.routeParams.name}!`,
@@ -185,21 +185,21 @@ const greetEndpoint: Endpoint = {
 export default buildConfig({
   endpoints: [helloEndpoint, greetEndpoint],
   collections: [],
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || "",
 })
 ```
 
 ### Collection Endpoints
 
 ```ts
-import type { CollectionConfig, Endpoint } from 'payload'
+import type { CollectionConfig, Endpoint } from "payload"
 
 const featuredEndpoint: Endpoint = {
-  path: '/featured',
-  method: 'get',
+  path: "/featured",
+  method: "get",
   handler: async (req) => {
     const posts = await req.payload.find({
-      collection: 'posts',
+      collection: "posts",
       where: { featured: { equals: true } },
     })
     return Response.json(posts)
@@ -207,11 +207,11 @@ const featuredEndpoint: Endpoint = {
 }
 
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   endpoints: [featuredEndpoint],
   fields: [
-    { name: 'title', type: 'text' },
-    { name: 'featured', type: 'checkbox' },
+    { name: "title", type: "text" },
+    { name: "featured", type: "checkbox" },
   ],
 }
 ```
@@ -221,22 +221,22 @@ export const Posts: CollectionConfig = {
 ### Field Component (Client)
 
 ```tsx
-'use client'
-import { useField } from '@payloadcms/ui'
-import type { TextFieldClientComponent } from 'payload'
+"use client"
+import { useField } from "@payloadcms/ui"
+import type { TextFieldClientComponent } from "payload"
 
 export const CustomField: TextFieldClientComponent = () => {
   const { value, setValue } = useField()
 
-  return <input value={value || ''} onChange={(e) => setValue(e.target.value)} />
+  return <input value={value || ""} onChange={(e) => setValue(e.target.value)} />
 }
 ```
 
 ### Custom View
 
 ```tsx
-'use client'
-import { DefaultTemplate } from '@payloadcms/next/templates'
+"use client"
+import { DefaultTemplate } from "@payloadcms/next/templates"
 
 export const CustomView = () => {
   return (
@@ -251,23 +251,23 @@ export const CustomView = () => {
 ### Admin Config
 
 ```ts
-import { buildConfig } from 'payload'
+import { buildConfig } from "payload"
 
 export default buildConfig({
   admin: {
     components: {
-      beforeDashboard: ['/components/BeforeDashboard'],
-      beforeLogin: ['/components/BeforeLogin'],
+      beforeDashboard: ["/components/BeforeDashboard"],
+      beforeLogin: ["/components/BeforeLogin"],
       views: {
         custom: {
-          Component: '/views/Custom',
-          path: '/custom',
+          Component: "/views/Custom",
+          path: "/custom",
         },
       },
     },
   },
   collections: [],
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || "",
 })
 ```
 
@@ -290,28 +290,28 @@ export default buildConfig({
 ### Using Plugins
 
 ```ts
-import { buildConfig } from 'payload'
-import { seoPlugin } from '@payloadcms/plugin-seo'
-import { redirectsPlugin } from '@payloadcms/plugin-redirects'
+import { buildConfig } from "payload"
+import { seoPlugin } from "@payloadcms/plugin-seo"
+import { redirectsPlugin } from "@payloadcms/plugin-redirects"
 
 export default buildConfig({
   plugins: [
     seoPlugin({
-      collections: ['posts', 'pages'],
+      collections: ["posts", "pages"],
     }),
     redirectsPlugin({
-      collections: ['pages'],
+      collections: ["pages"],
     }),
   ],
   collections: [],
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || "",
 })
 ```
 
 ### Creating Plugins
 
 ```ts
-import type { Config } from 'payload'
+import type { Config } from "payload"
 
 interface PluginOptions {
   enabled?: boolean
@@ -324,8 +324,8 @@ export const myPlugin =
     collections: [
       ...(config.collections || []),
       {
-        slug: 'plugin-collection',
-        fields: [{ name: 'title', type: 'text' }],
+        slug: "plugin-collection",
+        fields: [{ name: "title", type: "text" }],
       },
     ],
     onInit: async (payload) => {
@@ -338,30 +338,30 @@ export const myPlugin =
 ## Localization
 
 ```ts
-import { buildConfig } from 'payload'
-import type { Field, Payload } from 'payload'
+import { buildConfig } from "payload"
+import type { Field, Payload } from "payload"
 
 export default buildConfig({
   localization: {
-    locales: ['en', 'es', 'de'],
-    defaultLocale: 'en',
+    locales: ["en", "es", "de"],
+    defaultLocale: "en",
     fallback: true,
   },
   collections: [],
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || "",
 })
 
 // Localized field
 const localizedField: TextField = {
-  name: 'title',
-  type: 'text',
+  name: "title",
+  type: "text",
   localized: true,
 }
 
 // Query with locale
 const posts = await payload.find({
-  collection: 'posts',
-  locale: 'es',
+  collection: "posts",
+  locale: "es",
 })
 ```
 

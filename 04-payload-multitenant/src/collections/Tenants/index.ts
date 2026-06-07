@@ -1,10 +1,10 @@
-import { type CollectionConfig } from 'payload'
+import { type CollectionConfig } from "payload"
 
 export const Tenants: CollectionConfig = {
-  slug: 'tenants',
+  slug: "tenants",
   admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'domain'],
+    useAsTitle: "name",
+    defaultColumns: ["name", "slug", "domain"],
   },
   access: {
     // Modify these access controls based on your roles/permissions
@@ -15,13 +15,13 @@ export const Tenants: CollectionConfig = {
   },
   fields: [
     {
-      name: 'name',
-      type: 'text',
+      name: "name",
+      type: "text",
       required: true,
     },
     {
-      name: 'slug',
-      type: 'text',
+      name: "slug",
+      type: "text",
       required: true,
       unique: true,
       admin: {
@@ -29,23 +29,23 @@ export const Tenants: CollectionConfig = {
       },
     },
     {
-      name: 'domain',
-      type: 'text',
+      name: "domain",
+      type: "text",
       unique: true,
       admin: {
         description: 'Custom domain mapped to this tenant (e.g., "tenant-a.com").',
       },
     },
     {
-      name: 'template',
-      type: 'select',
-      defaultValue: 'light',
+      name: "template",
+      type: "select",
+      defaultValue: "light",
       options: [
-        { label: 'Light Theme', value: 'light' },
-        { label: 'Dark Theme', value: 'dark' },
+        { label: "Light Theme", value: "light" },
+        { label: "Dark Theme", value: "dark" },
       ],
       admin: {
-        description: 'Visual template layout for this tenant.',
+        description: "Visual template layout for this tenant.",
       },
     },
   ],

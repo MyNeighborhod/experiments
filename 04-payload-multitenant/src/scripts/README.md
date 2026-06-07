@@ -7,13 +7,17 @@ This folder contains scripts to programmatically seed or reset individual tenant
 You can run these scripts directly from the root of `04-payload-multitenant` at any time (even while the Next.js development server is running).
 
 ### 1. Reseed North Of Grand (NOG)
+
 To wipe and reseed all pages, posts, media, and navigation menu links for the **North of Grand** neighborhood:
+
 ```bash
 npx tsx src/scripts/seed-nog.ts
 ```
 
 ### 2. Reseed Beaverdale
+
 To wipe and reseed all pages, posts, media, and navigation menu links for the **Beaverdale** neighborhood:
+
 ```bash
 npx tsx src/scripts/seed-beaverdale.ts
 ```
@@ -21,7 +25,9 @@ npx tsx src/scripts/seed-beaverdale.ts
 ---
 
 ## What the Scripts Do
+
 Whenever you execute one of these scripts, it:
+
 1. Initializes Payload's local API.
 2. Identifies the target tenant by its slug (`nog` or `beaverdale`).
 3. If it already exists, it **deletes all associated pages, posts, media, headers, and footers** to prevent duplicate database records.

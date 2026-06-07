@@ -1,25 +1,25 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
-import { link } from '@/fields/link'
-import { revalidateFooter } from './hooks/revalidateFooter'
+import { link } from "@/fields/link"
+import { revalidateFooter } from "./hooks/revalidateFooter"
 
 export const Footer: CollectionConfig = {
-  slug: 'footer',
+  slug: "footer",
   access: {
     read: () => true,
   },
   fields: [
     {
-      name: 'logoImage',
-      type: 'upload',
-      relationTo: 'media',
+      name: "logoImage",
+      type: "upload",
+      relationTo: "media",
       admin: {
-        description: 'Upload a custom logo/wordmark image for this tenant footer.',
+        description: "Upload a custom logo/wordmark image for this tenant footer.",
       },
     },
     {
-      name: 'navItems',
-      type: 'array',
+      name: "navItems",
+      type: "array",
       fields: [
         link({
           appearances: false,
@@ -29,7 +29,7 @@ export const Footer: CollectionConfig = {
       admin: {
         initCollapsed: true,
         components: {
-          RowLabel: '@/Footer/RowLabel#RowLabel',
+          RowLabel: "@/Footer/RowLabel#RowLabel",
         },
       },
     },

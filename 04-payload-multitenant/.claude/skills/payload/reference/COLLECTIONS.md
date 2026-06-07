@@ -5,43 +5,43 @@ Complete reference for collection configurations and patterns.
 ## Basic Collection
 
 ```ts
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   labels: {
-    singular: 'Post',
-    plural: 'Posts',
+    singular: "Post",
+    plural: "Posts",
   },
   admin: {
-    useAsTitle: 'title',
-    defaultColumns: ['title', 'author', 'status', 'createdAt'],
-    group: 'Content', // Organize in admin sidebar
-    description: 'Blog posts and articles',
-    listSearchableFields: ['title', 'slug'],
+    useAsTitle: "title",
+    defaultColumns: ["title", "author", "status", "createdAt"],
+    group: "Content", // Organize in admin sidebar
+    description: "Blog posts and articles",
+    listSearchableFields: ["title", "slug"],
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
+      name: "title",
+      type: "text",
       required: true,
       index: true,
     },
     {
-      name: 'slug',
-      type: 'text',
+      name: "slug",
+      type: "text",
       unique: true,
       index: true,
-      admin: { position: 'sidebar' },
+      admin: { position: "sidebar" },
     },
     {
-      name: 'status',
-      type: 'select',
-      options: ['draft', 'published'],
-      defaultValue: 'draft',
+      name: "status",
+      type: "select",
+      options: ["draft", "published"],
+      defaultValue: "draft",
     },
   ],
-  defaultSort: '-createdAt',
+  defaultSort: "-createdAt",
   timestamps: true,
 }
 ```
@@ -50,7 +50,7 @@ export const Posts: CollectionConfig = {
 
 ```ts
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
   auth: {
     tokenExpiration: 7200, // 2 hours
     verify: true,
@@ -59,21 +59,21 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
   },
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: "email",
   },
   fields: [
     {
-      name: 'roles',
-      type: 'select',
+      name: "roles",
+      type: "select",
       hasMany: true,
-      options: ['admin', 'editor', 'user'],
+      options: ["admin", "editor", "user"],
       required: true,
-      defaultValue: ['user'],
+      defaultValue: ["user"],
       saveToJWT: true,
     },
     {
-      name: 'name',
-      type: 'text',
+      name: "name",
+      type: "text",
       required: true,
     },
   ],
@@ -84,24 +84,24 @@ export const Users: CollectionConfig = {
 
 ```ts
 export const Media: CollectionConfig = {
-  slug: 'media',
+  slug: "media",
   upload: {
-    staticDir: 'media',
-    mimeTypes: ['image/*'],
+    staticDir: "media",
+    mimeTypes: ["image/*"],
     imageSizes: [
       {
-        name: 'thumbnail',
+        name: "thumbnail",
         width: 400,
         height: 300,
-        position: 'centre',
+        position: "centre",
       },
       {
-        name: 'card',
+        name: "card",
         width: 768,
         height: 1024,
       },
     ],
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: "thumbnail",
     focalPoint: true,
     crop: true,
   },
@@ -110,13 +110,13 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
-      name: 'alt',
-      type: 'text',
+      name: "alt",
+      type: "text",
       required: true,
     },
     {
-      name: 'caption',
-      type: 'text',
+      name: "caption",
+      type: "text",
       localized: true,
     },
   ],
@@ -128,7 +128,7 @@ export const Media: CollectionConfig = {
 Enable real-time content preview during editing.
 
 ```ts
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
 const generatePreviewPath = ({
   slug,
@@ -144,15 +144,15 @@ const generatePreviewPath = ({
 }
 
 export const Pages: CollectionConfig = {
-  slug: 'pages',
+  slug: "pages",
   admin: {
-    useAsTitle: 'title',
+    useAsTitle: "title",
     // Live preview during editing
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
           slug: data?.slug as string,
-          collection: 'pages',
+          collection: "pages",
           req,
         }),
     },
@@ -160,13 +160,13 @@ export const Pages: CollectionConfig = {
     preview: (data, { req }) =>
       generatePreviewPath({
         slug: data?.slug as string,
-        collection: 'pages',
+        collection: "pages",
         req,
       }),
   },
   fields: [
-    { name: 'title', type: 'text' },
-    { name: 'slug', type: 'text' },
+    { name: "title", type: "text" },
+    { name: "slug", type: "text" },
   ],
 }
 ```
@@ -176,28 +176,28 @@ export const Pages: CollectionConfig = {
 Payload maintains version history and supports draft/publish workflows.
 
 ```ts
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
 // Basic versioning (audit log only)
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
   versions: true, // or { maxPerDoc: 100 }
-  fields: [{ name: 'name', type: 'text' }],
+  fields: [{ name: "name", type: "text" }],
 }
 
 // Drafts enabled (draft/publish workflow)
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   versions: {
     drafts: true, // Enables _status field
     maxPerDoc: 50,
   },
-  fields: [{ name: 'title', type: 'text' }],
+  fields: [{ name: "title", type: "text" }],
 }
 
 // Full configuration with autosave and scheduled publish
 export const Pages: CollectionConfig = {
-  slug: 'pages',
+  slug: "pages",
   versions: {
     drafts: {
       autosave: true, // Auto-save while editing
@@ -206,7 +206,7 @@ export const Pages: CollectionConfig = {
     },
     maxPerDoc: 100, // Keep last 100 versions (0 = unlimited)
   },
-  fields: [{ name: 'title', type: 'text' }],
+  fields: [{ name: "title", type: "text" }],
 }
 ```
 
@@ -215,23 +215,23 @@ export const Pages: CollectionConfig = {
 ```ts
 // Create draft
 await payload.create({
-  collection: 'posts',
-  data: { title: 'Draft Post' },
+  collection: "posts",
+  data: { title: "Draft Post" },
   draft: true, // Saves as draft, skips required field validation
 })
 
 // Update as draft
 await payload.update({
-  collection: 'posts',
-  id: '123',
-  data: { title: 'Updated Draft' },
+  collection: "posts",
+  id: "123",
+  data: { title: "Updated Draft" },
   draft: true,
 })
 
 // Read with drafts (returns newest draft if available)
 const post = await payload.findByID({
-  collection: 'posts',
-  id: '123',
+  collection: "posts",
+  id: "123",
   draft: true, // Returns draft version if exists
 })
 
@@ -240,17 +240,17 @@ const post = await payload.findByID({
 
 // Access control for drafts
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   versions: { drafts: true },
   access: {
     read: ({ req: { user } }) => {
       // Public can only see published
-      if (!user) return { _status: { equals: 'published' } }
+      if (!user) return { _status: { equals: "published" } }
       // Authenticated can see all
       return true
     },
   },
-  fields: [{ name: 'title', type: 'text' }],
+  fields: [{ name: "title", type: "text" }],
 }
 ```
 
@@ -267,34 +267,34 @@ The `_status` field is auto-injected when drafts are enabled:
 Globals are single-instance documents (not collections).
 
 ```ts
-import type { GlobalConfig } from 'payload'
+import type { GlobalConfig } from "payload"
 
 export const Header: GlobalConfig = {
-  slug: 'header',
-  label: 'Header',
+  slug: "header",
+  label: "Header",
   admin: {
-    group: 'Settings',
+    group: "Settings",
   },
   fields: [
     {
-      name: 'logo',
-      type: 'upload',
-      relationTo: 'media',
+      name: "logo",
+      type: "upload",
+      relationTo: "media",
       required: true,
     },
     {
-      name: 'nav',
-      type: 'array',
+      name: "nav",
+      type: "array",
       maxRows: 8,
       fields: [
         {
-          name: 'link',
-          type: 'relationship',
-          relationTo: 'pages',
+          name: "link",
+          type: "relationship",
+          relationTo: "pages",
         },
         {
-          name: 'label',
-          type: 'text',
+          name: "label",
+          type: "text",
         },
       ],
     },

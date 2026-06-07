@@ -1,4 +1,4 @@
-import { BeforeSync, DocToSync } from '@payloadcms/plugin-search/types'
+import { BeforeSync, DocToSync } from "@payloadcms/plugin-search/types"
 
 export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searchDoc }) => {
   const {
@@ -17,7 +17,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
       description: meta?.description,
     },
     categories: [],
-    tenant: typeof tenant === 'object' && tenant !== null ? tenant.id : tenant,
+    tenant: typeof tenant === "object" && tenant !== null ? tenant.id : tenant,
   }
 
   if (categories && Array.isArray(categories) && categories.length > 0) {
@@ -27,13 +27,13 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
         continue
       }
 
-      if (typeof category === 'object') {
+      if (typeof category === "object") {
         populatedCategories.push(category)
         continue
       }
 
       const doc = await req.payload.findByID({
-        collection: 'categories',
+        collection: "categories",
         id: category,
         disableErrors: true,
         depth: 0,
@@ -51,7 +51,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
     }
 
     modifiedDoc.categories = populatedCategories.map((each) => ({
-      relationTo: 'categories',
+      relationTo: "categories",
       categoryID: String(each.id),
       title: each.title,
     }))

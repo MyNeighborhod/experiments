@@ -225,11 +225,13 @@ That's it! The Docker instance will help you get up and running quickly while al
 ### Seed
 
 #### Global Seeding (Destructive)
+
 To seed the entire database with a default presentation layout (default tenant) and global pages/posts, you can click the **'Seed your database'** button directly from the Admin Dashboard at `http://localhost:3000/admin`.
 
 > NOTICE: global seeding is destructive because it drops and recreates all collections. Only run it if you want a complete reset.
 
 #### Standalone Tenant Seeding (Granular)
+
 We have added scripts to seed or reset individual tenant neighborhoods (`nog` and `beaverdale`) programmatically. These scripts will clean up existing data for that specific tenant and recreate its custom layout, media, pages, posts, header, and footer without affecting other tenants:
 
 - **Seed/Reset North of Grand (NOG)** (uses Light Theme):

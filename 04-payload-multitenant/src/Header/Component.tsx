@@ -1,11 +1,11 @@
-import { HeaderClient } from './Component.client'
-import { getCachedGlobal, getTenantId, getTenant } from '@/utilities/getGlobals'
-import React from 'react'
+import { HeaderClient } from "./Component.client"
+import { getCachedGlobal, getTenantId, getTenant } from "@/utilities/getGlobals"
+import React from "react"
 
 export async function Header() {
   const tenantId = await getTenantId()
   const tenant = await getTenant()
-  const headerData = await getCachedGlobal('header', tenantId, 1)()
+  const headerData = await getCachedGlobal("header", tenantId, 1)()
 
   return <HeaderClient data={headerData} tenant={tenant} />
 }

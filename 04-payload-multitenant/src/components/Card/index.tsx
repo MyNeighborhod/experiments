@@ -1,20 +1,20 @@
-'use client'
-import { cn } from '@/utilities/ui'
-import useClickableCard from '@/utilities/useClickableCard'
-import Link from 'next/link'
-import React, { Fragment } from 'react'
+"use client"
+import { cn } from "@/utilities/ui"
+import useClickableCard from "@/utilities/useClickableCard"
+import Link from "next/link"
+import React, { Fragment } from "react"
 
-import type { Post } from '@/payload-types'
+import type { Post } from "@/payload-types"
 
-import { Media } from '@/components/Media'
+import { Media } from "@/components/Media"
 
-export type CardPostData = Pick<Post, 'slug' | 'categories' | 'meta' | 'title'>
+export type CardPostData = Pick<Post, "slug" | "categories" | "meta" | "title">
 
 export const Card: React.FC<{
-  alignItems?: 'center'
+  alignItems?: "center"
   className?: string
   doc?: CardPostData
-  relationTo?: 'posts'
+  relationTo?: "posts"
   showCategories?: boolean
   title?: string
 }> = (props) => {
@@ -26,29 +26,30 @@ export const Card: React.FC<{
 
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
-  const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
+  const sanitizedDescription = description?.replace(/\s/g, " ") // replace non-breaking space with white space
   const href = `/${relationTo}/${slug}`
 
   return (
     <article
       className={cn(
-        'border border-border rounded-lg overflow-hidden bg-card hover:cursor-pointer',
+        "border border-border rounded-lg overflow-hidden bg-card hover:cursor-pointer",
         className,
       )}
+      /* eslint-disable-next-line react-hooks/refs */
       ref={card.ref}
     >
       <div className="relative w-full ">
         {!metaImage && <div className="">No image</div>}
-        {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
+        {metaImage && typeof metaImage !== "string" && <Media resource={metaImage} size="33vw" />}
       </div>
       <div className="p-4">
         {showCategories && hasCategories && (
           <div className="uppercase text-sm mb-4">
             {categories?.map((category, index) => {
-              if (typeof category === 'object') {
+              if (typeof category === "object") {
                 const { title: titleFromCategory } = category
 
-                const categoryTitle = titleFromCategory || 'Untitled category'
+                const categoryTitle = titleFromCategory || "Untitled category"
 
                 const isLast = index === categories.length - 1
 
@@ -67,6 +68,7 @@ export const Card: React.FC<{
         {titleToUse && (
           <div className="prose">
             <h3>
+              {/* eslint-disable-next-line react-hooks/refs */}
               <Link className="not-prose" href={href} ref={link.ref}>
                 {titleToUse}
               </Link>

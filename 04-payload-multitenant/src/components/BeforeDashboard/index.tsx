@@ -1,10 +1,10 @@
-import { Banner } from '@payloadcms/ui/elements/Banner'
-import React from 'react'
+import { Banner } from "@payloadcms/ui/elements/Banner"
+import React from "react"
 
-import { SeedButton } from './SeedButton'
-import './index.scss'
+import { SeedButton } from "./SeedButton"
+import "./index.scss"
 
-const baseClass = 'before-dashboard'
+const baseClass = "before-dashboard"
 
 const BeforeDashboard: React.FC = () => {
   return (
@@ -16,14 +16,14 @@ const BeforeDashboard: React.FC = () => {
       <ul className={`${baseClass}__instructions`}>
         <li>
           <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
+          {" with a few pages, posts, and projects to jump-start your new site, then "}
           <a href="/" target="_blank">
             visit your website
           </a>
-          {' to see the results.'}
+          {" to see the results."}
         </li>
         <li>
-          {'Modify your '}
+          {"Modify your "}
           <a
             href="https://payloadcms.com/docs/configuration/collections"
             rel="noopener noreferrer"
@@ -31,7 +31,7 @@ const BeforeDashboard: React.FC = () => {
           >
             collections
           </a>
-          {' and add more '}
+          {" and add more "}
           <a
             href="https://payloadcms.com/docs/fields/overview"
             rel="noopener noreferrer"
@@ -39,7 +39,7 @@ const BeforeDashboard: React.FC = () => {
           >
             fields
           </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
+          {" as needed. If you are new to Payload, we also recommend you check out the "}
           <a
             href="https://payloadcms.com/docs/getting-started/what-is-payload"
             rel="noopener noreferrer"
@@ -47,13 +47,13 @@ const BeforeDashboard: React.FC = () => {
           >
             Getting Started
           </a>
-          {' docs.'}
+          {" docs."}
         </li>
         <li>
           Commit and push your changes to the repository to trigger a redeployment of your project.
         </li>
       </ul>
-      {'Pro Tip: This block is a '}
+      {"Pro Tip: This block is a "}
       <a
         href="https://payloadcms.com/docs/custom-components/overview"
         rel="noopener noreferrer"

@@ -6,12 +6,12 @@ Complete reference for collection hooks, field hooks, and hook context patterns.
 
 ```ts
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   hooks: {
     // Before validation
     beforeValidate: [
       async ({ data, operation }) => {
-        if (operation === 'create') {
+        if (operation === "create") {
           data.slug = slugify(data.title)
         }
         return data
@@ -21,7 +21,7 @@ export const Posts: CollectionConfig = {
     // Before save
     beforeChange: [
       async ({ data, req, operation, originalDoc }) => {
-        if (operation === 'update' && data.status === 'published') {
+        if (operation === "update" && data.status === "published") {
           data.publishedAt = new Date()
         }
         return data
@@ -31,7 +31,7 @@ export const Posts: CollectionConfig = {
     // After save
     afterChange: [
       async ({ doc, req, operation, previousDoc }) => {
-        if (operation === 'create') {
+        if (operation === "create") {
           await sendNotification(doc)
         }
         return doc
@@ -59,7 +59,7 @@ export const Posts: CollectionConfig = {
 ## Field Hooks
 
 ```ts
-import type { EmailField, FieldHook } from 'payload'
+import type { EmailField, FieldHook } from "payload"
 
 const beforeValidateHook: FieldHook = ({ value }) => {
   return value.trim().toLowerCase()
@@ -67,15 +67,15 @@ const beforeValidateHook: FieldHook = ({ value }) => {
 
 const afterReadHook: FieldHook = ({ value, req }) => {
   // Hide email from non-admins
-  if (!req.user?.roles?.includes('admin')) {
-    return value.replace(/(.{2})(.*)(@.*)/, '$1***$3')
+  if (!req.user?.roles?.includes("admin")) {
+    return value.replace(/(.{2})(.*)(@.*)/, "$1***$3")
   }
   return value
 }
 
 const emailField: EmailField = {
-  name: 'email',
-  type: 'email',
+  name: "email",
+  type: "email",
   hooks: {
     beforeValidate: [beforeValidateHook],
     afterRead: [afterReadHook],
@@ -88,10 +88,10 @@ const emailField: EmailField = {
 Share data between hooks or control hook behavior using request context:
 
 ```ts
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
 export const Posts: CollectionConfig = {
-  slug: 'posts',
+  slug: "posts",
   hooks: {
     beforeChange: [
       async ({ context }) => {
@@ -105,16 +105,16 @@ export const Posts: CollectionConfig = {
       },
     ],
   },
-  fields: [{ name: 'title', type: 'text' }],
+  fields: [{ name: "title", type: "text" }],
 }
 ```
 
 ## Next.js Revalidation with Context Control
 
 ```ts
-import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
-import { revalidatePath } from 'next/cache'
-import type { Page } from '../payload-types'
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from "payload"
+import { revalidatePath } from "next/cache"
+import type { Page } from "../payload-types"
 
 export const revalidatePage: CollectionAfterChangeHook<Page> = ({
   doc,
@@ -122,15 +122,15 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
   req: { payload, context },
 }) => {
   if (!context.disableRevalidate) {
-    if (doc._status === 'published') {
-      const path = doc.slug === 'home' ? '/' : `/${doc.slug}`
+    if (doc._status === "published") {
+      const path = doc.slug === "home" ? "/" : `/${doc.slug}`
       payload.logger.info(`Revalidating page at path: ${path}`)
       revalidatePath(path)
     }
 
     // Revalidate old path if unpublished
-    if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      const oldPath = previousDoc.slug === 'home' ? '/' : `/${previousDoc.slug}`
+    if (previousDoc?._status === "published" && doc._status !== "published") {
+      const oldPath = previousDoc.slug === "home" ? "/" : `/${previousDoc.slug}`
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
       revalidatePath(oldPath)
     }
@@ -140,7 +140,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
 export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { context } }) => {
   if (!context.disableRevalidate) {
-    const path = doc?.slug === 'home' ? '/' : `/${doc?.slug}`
+    const path = doc?.slug === "home" ? "/" : `/${doc?.slug}`
     revalidatePath(path)
   }
   return doc
@@ -152,21 +152,21 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
 Automatically set date when document is published:
 
 ```ts
-import type { DateField } from 'payload'
+import type { DateField } from "payload"
 
 const publishedOnField: DateField = {
-  name: 'publishedOn',
-  type: 'date',
+  name: "publishedOn",
+  type: "date",
   admin: {
     date: {
-      pickerAppearance: 'dayAndTime',
+      pickerAppearance: "dayAndTime",
     },
-    position: 'sidebar',
+    position: "sidebar",
   },
   hooks: {
     beforeChange: [
       ({ siblingData, value }) => {
-        if (siblingData._status === 'published' && !value) {
+        if (siblingData._status === "published" && !value) {
           return new Date()
         }
         return value

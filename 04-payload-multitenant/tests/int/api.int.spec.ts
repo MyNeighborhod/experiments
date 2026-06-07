@@ -1,19 +1,19 @@
-import { getPayload, Payload } from 'payload'
-import config from '@/payload.config'
+import { getPayload, Payload } from "payload"
+import config from "@/payload.config"
 
-import { describe, it, beforeAll, expect } from 'vitest'
+import { describe, it, beforeAll, expect } from "vitest"
 
 let payload: Payload
 
-describe('API', () => {
+describe("API", () => {
   beforeAll(async () => {
     const payloadConfig = await config
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('fetches users', async () => {
+  it("fetches users", async () => {
     const users = await payload.find({
-      collection: 'users',
+      collection: "users",
     })
     expect(users).toBeDefined()
   })

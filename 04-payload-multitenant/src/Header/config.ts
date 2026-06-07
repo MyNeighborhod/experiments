@@ -1,25 +1,26 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig } from "payload"
 
-import { link } from '@/fields/link'
-import { revalidateHeader } from './hooks/revalidateHeader'
+import { link } from "@/fields/link"
+import { revalidateHeader } from "./hooks/revalidateHeader"
 
 export const Header: CollectionConfig = {
-  slug: 'header',
+  slug: "header",
   access: {
     read: () => true,
   },
   fields: [
     {
-      name: 'logoImage',
-      type: 'upload',
-      relationTo: 'media',
+      name: "logoImage",
+      type: "upload",
+      relationTo: "media",
       admin: {
-        description: 'Upload a custom logo image for this tenant header. If not provided, a default logo or text will be used.',
+        description:
+          "Upload a custom logo image for this tenant header. If not provided, a default logo or text will be used.",
       },
     },
     {
-      name: 'navItems',
-      type: 'array',
+      name: "navItems",
+      type: "array",
       fields: [
         link({
           appearances: false,
@@ -29,7 +30,7 @@ export const Header: CollectionConfig = {
       admin: {
         initCollapsed: true,
         components: {
-          RowLabel: '@/Header/RowLabel#RowLabel',
+          RowLabel: "@/Header/RowLabel#RowLabel",
         },
       },
     },

@@ -4,7 +4,7 @@ This directory contains database seeding templates and helper functions used to 
 
 ## Purpose
 
-When running a multi-tenant platform, creating a new tenant should automatically configure standard pages (like `Home` and `Contact`), navigation headers/footers, and default content rather than leaving the tenant's admin dashboard empty. 
+When running a multi-tenant platform, creating a new tenant should automatically configure standard pages (like `Home` and `Contact`), navigation headers/footers, and default content rather than leaving the tenant's admin dashboard empty.
 
 The templates defined in this folder are modeled after the Beaverdale layout configurations and serve as the baseline setup for any new tenant.
 
@@ -33,6 +33,7 @@ pnpm tsx src/scripts/generate-tenant.ts --slug=oakwood --name="Oakwood Neighborh
 ```
 
 The script will:
+
 1. Generate a random 8-character password.
 2. Add the username and password to your local `.env` file under `TENANT_<SLUG>_USERNAME` and `TENANT_<SLUG>_PASSWORD`.
 3. Create the tenant record in the database.

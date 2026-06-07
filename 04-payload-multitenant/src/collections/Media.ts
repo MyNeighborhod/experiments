@@ -1,16 +1,21 @@
-import type { CollectionConfig, CollectionAfterChangeHook, CollectionBeforeDeleteHook, CollectionAfterReadHook } from 'payload'
+import type {
+  CollectionConfig,
+  CollectionAfterChangeHook,
+  CollectionBeforeDeleteHook,
+  CollectionAfterReadHook,
+} from "payload"
 
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
   lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import fs from 'fs'
+} from "@payloadcms/richtext-lexical"
+import path from "path"
+import { fileURLToPath } from "url"
+import fs from "fs"
 
-import { anyone } from '../access/anyone'
-import { authenticated } from '../access/authenticated'
+import { anyone } from "../access/anyone"
+import { authenticated } from "../access/authenticated"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,27 +28,27 @@ async function getTenantSlug(req: any, tenantId: string | number): Promise<strin
   }
   try {
     const tenant = await req.payload.findByID({
-      collection: 'tenants',
+      collection: "tenants",
       id: tenantId,
       depth: 0,
     })
-    const slug = tenant?.slug || 'global'
+    const slug = tenant?.slug || "global"
     tenantSlugCache.set(tenantId, slug)
     return slug
   } catch (err) {
-    return 'global'
+    return "global"
   }
 }
 
 const afterChangeHook: CollectionAfterChangeHook = async ({ doc, req, operation }) => {
-  if (operation === 'create' || operation === 'update') {
-    let slug = 'global'
+  if (operation === "create" || operation === "update") {
+    let slug = "global"
     if (doc.tenant) {
-      const tenantId = typeof doc.tenant === 'object' ? doc.tenant.id : doc.tenant
+      const tenantId = typeof doc.tenant === "object" ? doc.tenant.id : doc.tenant
       slug = await getTenantSlug(req, tenantId)
     }
 
-    const baseDir = path.resolve(dirname, '../../public/media')
+    const baseDir = path.resolve(dirname, "../../public/media")
     const destDir = path.join(baseDir, slug)
 
     if (!fs.existsSync(destDir)) {
@@ -78,19 +83,19 @@ const afterChangeHook: CollectionAfterChangeHook = async ({ doc, req, operation 
 
 const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
   const doc = await req.payload.findByID({
-    collection: 'media',
+    collection: "media",
     id,
     req,
   })
   if (!doc) return
 
-  let slug = 'global'
+  let slug = "global"
   if (doc.tenant) {
-    const tenantId = typeof doc.tenant === 'object' ? doc.tenant.id : doc.tenant
+    const tenantId = typeof doc.tenant === "object" ? doc.tenant.id : doc.tenant
     slug = await getTenantSlug(req, tenantId)
   }
 
-  const baseDir = path.resolve(dirname, '../../public/media')
+  const baseDir = path.resolve(dirname, "../../public/media")
   const destDir = path.join(baseDir, slug)
 
   // Delete main file
@@ -105,7 +110,7 @@ const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
   if (doc.sizes) {
     for (const sizeKey of Object.keys(doc.sizes)) {
       const sizeObj = (doc.sizes as Record<string, unknown>)[sizeKey]
-      if (sizeObj && typeof sizeObj === 'object' && 'filename' in sizeObj) {
+      if (sizeObj && typeof sizeObj === "object" && "filename" in sizeObj) {
         const sizeFilename = (sizeObj as { filename?: string | null }).filename
         if (sizeFilename) {
           const filePath = path.join(destDir, sizeFilename)
@@ -119,9 +124,10 @@ const beforeDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
 }
 
 const afterReadHook: CollectionAfterReadHook = async ({ doc, req }) => {
-  let slug = 'global'
+  console.log("afterReadHook called for", doc.filename)
+  let slug = "global"
   if (doc.tenant) {
-    const tenantId = typeof doc.tenant === 'object' ? doc.tenant.id : doc.tenant
+    const tenantId = typeof doc.tenant === "object" ? doc.tenant.id : doc.tenant
     slug = await getTenantSlug(req, tenantId)
   }
 
@@ -142,7 +148,7 @@ const afterReadHook: CollectionAfterReadHook = async ({ doc, req }) => {
 }
 
 export const Media: CollectionConfig = {
-  slug: 'media',
+  slug: "media",
   folders: true,
   access: {
     create: authenticated,
@@ -157,13 +163,13 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
-      name: 'alt',
-      type: 'text',
+      name: "alt",
+      type: "text",
       //required: true,
     },
     {
-      name: 'caption',
-      type: 'richText',
+      name: "caption",
+      type: "richText",
       editor: lexicalEditor({
         features: ({ rootFeatures }) => {
           return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
@@ -173,40 +179,40 @@ export const Media: CollectionConfig = {
   ],
   upload: {
     // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-    staticDir: path.resolve(dirname, '../../public/media'),
-    adminThumbnail: 'thumbnail',
+    staticDir: path.resolve(dirname, "../../public/media"),
+    adminThumbnail: "thumbnail",
     focalPoint: true,
     imageSizes: [
       {
-        name: 'thumbnail',
+        name: "thumbnail",
         width: 300,
       },
       {
-        name: 'square',
+        name: "square",
         width: 500,
         height: 500,
       },
       {
-        name: 'small',
+        name: "small",
         width: 600,
       },
       {
-        name: 'medium',
+        name: "medium",
         width: 900,
       },
       {
-        name: 'large',
+        name: "large",
         width: 1400,
       },
       {
-        name: 'xlarge',
+        name: "xlarge",
         width: 1920,
       },
       {
-        name: 'og',
+        name: "og",
         width: 1200,
         height: 630,
-        crop: 'center',
+        crop: "center",
       },
     ],
   },

@@ -1,29 +1,29 @@
-import { withPayload } from '@payloadcms/next/withPayload'
-import type { NextConfig } from 'next'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { withPayload } from "@payloadcms/next/withPayload"
+import type { NextConfig } from "next"
+import path from "path"
+import { fileURLToPath } from "url"
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
-import { redirects } from './redirects'
+import { redirects } from "./redirects"
 
 const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
+  : process.env.__NEXT_PRIVATE_ORIGIN || "http://localhost:3000"
 
 const nextConfig: NextConfig = {
   // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
   // See: https://github.com/vercel/next.js/issues/86431
   sassOptions: {
-    loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
+    loadPaths: ["./node_modules/@payloadcms/ui/dist/scss/"],
   },
   images: {
     localPatterns: [
       {
-        pathname: '/api/media/file/**',
+        pathname: "/api/media/file/**",
       },
       {
-        pathname: '/media/**',
+        pathname: "/media/**",
       },
     ],
     qualities: [100],
@@ -33,16 +33,16 @@ const nextConfig: NextConfig = {
 
         return {
           hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
+          protocol: url.protocol.replace(":", "") as "http" | "https",
         }
       }),
     ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
+      ".cjs": [".cts", ".cjs"],
+      ".js": [".ts", ".tsx", ".js", ".jsx"],
+      ".mjs": [".mts", ".mjs"],
     }
 
     return webpackConfig

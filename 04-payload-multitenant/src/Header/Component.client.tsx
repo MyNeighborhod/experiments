@@ -1,13 +1,13 @@
-'use client'
-import { useHeaderTheme } from '@/providers/HeaderTheme'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+"use client"
+import { useHeaderTheme } from "@/providers/HeaderTheme"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import React, { useEffect, useState } from "react"
 
-import type { Header } from '@/payload-types'
+import type { Header } from "@/payload-types"
 
-import { Logo } from '@/components/Logo/Logo'
-import { HeaderNav } from './Nav'
+import { Logo } from "@/components/Logo/Logo"
+import { HeaderNav } from "./Nav"
 
 interface HeaderClientProps {
   data: Header
@@ -26,30 +26,34 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, tenant }) => {
   }, [pathname])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (headerTheme && headerTheme !== theme) setTheme(headerTheme)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headerTheme])
 
-  const isNog = tenant?.slug === 'nog'
+  const isNog = tenant?.slug === "nog"
   const logoImage = (data as any)?.logoImage
-  const logoUrl = logoImage && typeof logoImage === 'object' ? logoImage.url : null
+  const logoUrl = logoImage && typeof logoImage === "object" ? logoImage.url : null
 
   if (isNog) {
     return (
-      <header className="container relative z-20 pt-8" {...(theme ? { 'data-theme': theme } : {})}>
+      <header className="container relative z-20 pt-8" {...(theme ? { "data-theme": theme } : {})}>
         <div className="flex flex-col items-center">
           {logoUrl ? (
             <Link href="/">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={logoUrl}
-                alt={tenant?.name || 'North Of Grand'}
+                alt={tenant?.name || "North Of Grand"}
                 className="max-h-28 w-auto object-contain mb-2"
                 loading="eager"
               />
             </Link>
           ) : (
-            <Link href="/" className="font-serif text-3xl font-bold tracking-widest text-[#76b3b8] mb-2">
+            <Link
+              href="/"
+              className="font-serif text-3xl font-bold tracking-widest text-[#76b3b8] mb-2"
+            >
               North Of Grand
             </Link>
           )}
@@ -62,13 +66,13 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, tenant }) => {
   }
 
   return (
-    <header className="container relative z-20" {...(theme ? { 'data-theme': theme } : {})}>
+    <header className="container relative z-20" {...(theme ? { "data-theme": theme } : {})}>
       <div className="py-8 flex items-center justify-between">
         <Link href="/">
           {logoUrl ? (
             <img
               src={logoUrl}
-              alt={tenant?.name || 'Logo'}
+              alt={tenant?.name || "Logo"}
               className="max-h-12 w-auto object-contain"
               loading="eager"
             />

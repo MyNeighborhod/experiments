@@ -1,13 +1,13 @@
-import type { Post, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
+import type { Post, ArchiveBlock as ArchiveBlockProps } from "@/payload-types"
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import React from 'react'
-import RichText from '@/components/RichText'
+import configPromise from "@payload-config"
+import { getPayload } from "payload"
+import React from "react"
+import RichText from "@/components/RichText"
 
-import { CollectionArchive } from '@/components/CollectionArchive'
+import { CollectionArchive } from "@/components/CollectionArchive"
 
-import { getTenantId } from '@/utilities/getGlobals'
+import { getTenantId } from "@/utilities/getGlobals"
 
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
@@ -20,12 +20,12 @@ export const ArchiveBlock: React.FC<
 
   let posts: Post[] = []
 
-  if (populateBy === 'collection') {
+  if (populateBy === "collection") {
     const payload = await getPayload({ config: configPromise })
     const tenantId = await getTenantId()
 
     const flattenedCategories = categories?.map((category) => {
-      if (typeof category === 'object') return category.id
+      if (typeof category === "object") return category.id
       else return category
     })
 
@@ -38,7 +38,7 @@ export const ArchiveBlock: React.FC<
     }
 
     const fetchedPosts = await payload.find({
-      collection: 'posts',
+      collection: "posts",
       depth: 1,
       limit,
       where: andConditions.length > 0 ? { and: andConditions } : undefined,
@@ -48,7 +48,7 @@ export const ArchiveBlock: React.FC<
   } else {
     if (selectedDocs?.length) {
       const filteredSelectedPosts = selectedDocs.map((post) => {
-        if (typeof post.value === 'object') return post.value
+        if (typeof post.value === "object") return post.value
       }) as Post[]
 
       posts = filteredSelectedPosts

@@ -1,23 +1,23 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
-import { PayloadRedirects } from '@/components/PayloadRedirects'
-import configPromise from '@payload-config'
-import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
-import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
-import { homeStatic } from '@/endpoints/seed/home-static'
+import { PayloadRedirects } from "@/components/PayloadRedirects"
+import configPromise from "@payload-config"
+import { getPayload, type RequiredDataFromCollectionSlug } from "payload"
+import { draftMode } from "next/headers"
+import React, { cache } from "react"
+import { homeStatic } from "@/endpoints/seed/home-static"
 
-import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { RenderHero } from '@/heros/RenderHero'
-import { generateMeta } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { NogInteractive } from './NogInteractive.client'
+import { RenderBlocks } from "@/blocks/RenderBlocks"
+import { RenderHero } from "@/heros/RenderHero"
+import { generateMeta } from "@/utilities/generateMeta"
+import PageClient from "./page.client"
+import { LivePreviewListener } from "@/components/LivePreviewListener"
+import { NogInteractive } from "./NogInteractive.client"
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({
-    collection: 'pages',
+    collection: "pages",
     draft: false,
     limit: 1000,
     overrideAccess: false,
@@ -31,10 +31,11 @@ export async function generateStaticParams() {
 
   const params = pages.docs
     ?.filter((doc) => {
-      return doc.slug !== 'home'
+      return doc.slug !== "home"
     })
     .map((doc) => {
-      const tenantSlug = typeof doc.tenant === 'object' && doc.tenant !== null ? doc.tenant.slug : 'default'
+      const tenantSlug =
+        typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
       return {
         tenant: tenantSlug,
         slug: doc.slug,
@@ -53,11 +54,11 @@ type Args = {
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { slug = 'home', tenant } = await paramsPromise
+  const { slug = "home", tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = '/' + decodedSlug
-  let page: RequiredDataFromCollectionSlug<'pages'> | null
+  const url = "/" + decodedSlug
+  let page: RequiredDataFromCollectionSlug<"pages"> | null
 
   page = await queryPageBySlug({
     slug: decodedSlug,
@@ -65,7 +66,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   })
 
   // Remove this code once your website is seeded
-  if (!page && slug === 'home') {
+  if (!page && slug === "home") {
     page = homeStatic
   }
 
@@ -74,10 +75,15 @@ export default async function Page({ params: paramsPromise }: Args) {
   }
 
   const { hero, layout } = page
-  const isNog = tenant === 'nog'
+  const isNog = tenant === "nog"
 
   if (isNog) {
-    if (decodedSlug === 'yearly-calendar' || decodedSlug === 'archives-and-documents' || decodedSlug === 'contact' || decodedSlug === 'about') {
+    if (
+      decodedSlug === "yearly-calendar" ||
+      decodedSlug === "archives-and-documents" ||
+      decodedSlug === "contact" ||
+      decodedSlug === "about"
+    ) {
       return (
         <article className="pt-8 pb-24 theme-nog">
           <PageClient />
@@ -85,40 +91,59 @@ export default async function Page({ params: paramsPromise }: Args) {
           {draft && <LivePreviewListener />}
 
           <div className="container max-w-6xl">
-            {decodedSlug === 'about' && (
+            {decodedSlug === "about" && (
               <div className="max-w-4xl mx-auto">
                 <h1 className="text-center font-serif text-5xl mb-6">About</h1>
                 <NogInteractive pageSlug="about" />
                 <div className="text-center my-8 text-gray-600">
                   <strong className="block text-gray-800 text-lg mb-2">About North of Grand</strong>
                   <p className="mb-6 leading-relaxed">
-                    Nestled within the vibrant cityscape of Des Moines, Iowa, the North of Grand neighborhood offers a harmonious blend of urban convenience and historic charm. Characterized by tree-lined streets and an eclectic mix of architectural styles, our cozy neighborhood boasts a distinct personality that captivates residents and visitors alike. From quaint boutique shops and unique bars & eateries, to lively community events like Ingersoll Live, North of Grand provides a dynamic living experience. Its proximity to downtown Des Moines ensures easy access to cultural attractions, dining options, and employment opportunities, while maintaining a serene residential atmosphere.
+                    Nestled within the vibrant cityscape of Des Moines, Iowa, the North of Grand
+                    neighborhood offers a harmonious blend of urban convenience and historic charm.
+                    Characterized by tree-lined streets and an eclectic mix of architectural styles,
+                    our cozy neighborhood boasts a distinct personality that captivates residents
+                    and visitors alike. From quaint boutique shops and unique bars & eateries, to
+                    lively community events like Ingersoll Live, North of Grand provides a dynamic
+                    living experience. Its proximity to downtown Des Moines ensures easy access to
+                    cultural attractions, dining options, and employment opportunities, while
+                    maintaining a serene residential atmosphere.
                   </p>
                   <strong className="block text-gray-800 text-lg mb-2">Our Mission</strong>
                   <p className="mb-8 leading-relaxed">
-                    Our Mission is to strengthen relationships and improve quality of life for all residents and businesses in the North of Grand neighborhood. We commit to enhancing livability and revitalizing our historic neighborhood through opportunities of civic engagement. We advocate on behalf of North of Grand’s diverse residents as a liaison with local governments to preserve and uphold our community’s vibrant characteristics.
+                    Our Mission is to strengthen relationships and improve quality of life for all
+                    residents and businesses in the North of Grand neighborhood. We commit to
+                    enhancing livability and revitalizing our historic neighborhood through
+                    opportunities of civic engagement. We advocate on behalf of North of Grand’s
+                    diverse residents as a liaison with local governments to preserve and uphold our
+                    community’s vibrant characteristics.
                   </p>
-                  <h2 className="text-center font-serif text-2xl mt-12 mb-6">Meet Our 2026 Board Members</h2>
+                  <h2 className="text-center font-serif text-2xl mt-12 mb-6">
+                    Meet Our 2026 Board Members
+                  </h2>
                 </div>
                 <RenderBlocks blocks={layout.slice(1)} />
               </div>
             )}
 
-            {decodedSlug === 'yearly-calendar' && (
+            {decodedSlug === "yearly-calendar" && (
               <div className="max-w-4xl mx-auto">
-                <h1 className="text-center font-serif text-4xl mb-6 font-semibold">Yearly Calendar</h1>
+                <h1 className="text-center font-serif text-4xl mb-6 font-semibold">
+                  Yearly Calendar
+                </h1>
                 <NogInteractive pageSlug="yearly-calendar" />
               </div>
             )}
 
-            {decodedSlug === 'archives-and-documents' && (
+            {decodedSlug === "archives-and-documents" && (
               <div className="max-w-4xl mx-auto">
-                <h1 className="text-center font-serif text-4xl mb-6 font-semibold">Archives and Documents</h1>
+                <h1 className="text-center font-serif text-4xl mb-6 font-semibold">
+                  Archives and Documents
+                </h1>
                 <NogInteractive pageSlug="archives-and-documents" />
               </div>
             )}
 
-            {decodedSlug === 'contact' && (
+            {decodedSlug === "contact" && (
               <div className="max-w-6xl mx-auto">
                 <h1 className="text-center font-serif text-4xl mb-6 font-semibold">Contact Us</h1>
                 <NogInteractive pageSlug="contact" />
@@ -145,7 +170,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = 'home', tenant } = await paramsPromise
+  const { slug = "home", tenant } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const page = await queryPageBySlug({
@@ -163,12 +188,9 @@ const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
 
   // 1. Resolve tenant ID
   const tenantDoc = await payload.find({
-    collection: 'tenants',
+    collection: "tenants",
     where: {
-      or: [
-        { slug: { equals: tenant } },
-        { domain: { equals: tenant } },
-      ],
+      or: [{ slug: { equals: tenant } }, { domain: { equals: tenant } }],
     },
     limit: 1,
   })
@@ -177,16 +199,13 @@ const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
 
   // 2. Query page matching slug and tenant ID
   const result = await payload.find({
-    collection: 'pages',
+    collection: "pages",
     draft,
     limit: 1,
     pagination: false,
     overrideAccess: draft,
     where: {
-      and: [
-        { slug: { equals: slug } },
-        ...(tenantId ? [{ tenant: { equals: tenantId } }] : []),
-      ],
+      and: [{ slug: { equals: slug } }, ...(tenantId ? [{ tenant: { equals: tenantId } }] : [])],
     },
   })
 

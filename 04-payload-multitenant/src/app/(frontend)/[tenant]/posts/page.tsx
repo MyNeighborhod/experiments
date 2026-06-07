@@ -1,14 +1,14 @@
-import type { Metadata } from 'next/types'
+import type { Metadata } from "next/types"
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import { PageRange } from '@/components/PageRange'
-import { Pagination } from '@/components/Pagination'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import React from 'react'
-import PageClient from './page.client'
+import { CollectionArchive } from "@/components/CollectionArchive"
+import { PageRange } from "@/components/PageRange"
+import { Pagination } from "@/components/Pagination"
+import configPromise from "@payload-config"
+import { getPayload } from "payload"
+import React from "react"
+import PageClient from "./page.client"
 
-export const dynamic = 'force-static'
+export const dynamic = "force-static"
 export const revalidate = 600
 
 type Args = {
@@ -20,7 +20,7 @@ type Args = {
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const tenants = await payload.find({
-    collection: 'tenants',
+    collection: "tenants",
     limit: 1000,
     select: {
       slug: true,
@@ -38,12 +38,9 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   // Resolve tenant ID
   const tenantDoc = await payload.find({
-    collection: 'tenants',
+    collection: "tenants",
     where: {
-      or: [
-        { slug: { equals: tenant } },
-        { domain: { equals: tenant } },
-      ],
+      or: [{ slug: { equals: tenant } }, { domain: { equals: tenant } }],
     },
     limit: 1,
   })
@@ -51,7 +48,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const tenantId = tenantDoc.docs[0]?.id
 
   const posts = await payload.find({
-    collection: 'posts',
+    collection: "posts",
     depth: 1,
     limit: 12,
     overrideAccess: false,

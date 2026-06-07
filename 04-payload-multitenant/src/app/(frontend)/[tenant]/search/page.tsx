@@ -1,12 +1,12 @@
-import type { Metadata } from 'next/types'
+import type { Metadata } from "next/types"
 
-import { CollectionArchive } from '@/components/CollectionArchive'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-import React from 'react'
-import { Search } from '@/search/Component'
-import PageClient from './page.client'
-import { CardPostData } from '@/components/Card'
+import { CollectionArchive } from "@/components/CollectionArchive"
+import configPromise from "@payload-config"
+import { getPayload } from "payload"
+import React from "react"
+import { Search } from "@/search/Component"
+import PageClient from "./page.client"
+import { CardPostData } from "@/components/Card"
 
 type Args = {
   params: Promise<{
@@ -16,19 +16,19 @@ type Args = {
     q: string
   }>
 }
-export default async function Page({ params: paramsPromise, searchParams: searchParamsPromise }: Args) {
+export default async function Page({
+  params: paramsPromise,
+  searchParams: searchParamsPromise,
+}: Args) {
   const { tenant } = await paramsPromise
   const { q: query } = await searchParamsPromise
   const payload = await getPayload({ config: configPromise })
 
   // Resolve tenant ID
   const tenantDoc = await payload.find({
-    collection: 'tenants',
+    collection: "tenants",
     where: {
-      or: [
-        { slug: { equals: tenant } },
-        { domain: { equals: tenant } },
-      ],
+      or: [{ slug: { equals: tenant } }, { domain: { equals: tenant } }],
     },
     limit: 1,
   })
@@ -49,12 +49,12 @@ export default async function Page({ params: paramsPromise, searchParams: search
           },
         },
         {
-          'meta.description': {
+          "meta.description": {
             like: query,
           },
         },
         {
-          'meta.title': {
+          "meta.title": {
             like: query,
           },
         },
@@ -68,7 +68,7 @@ export default async function Page({ params: paramsPromise, searchParams: search
   }
 
   const posts = await payload.find({
-    collection: 'search',
+    collection: "search",
     depth: 1,
     limit: 12,
     select: {

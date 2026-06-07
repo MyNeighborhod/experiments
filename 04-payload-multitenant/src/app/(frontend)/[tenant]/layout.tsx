@@ -1,45 +1,45 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next"
 
-import { cn } from '@/utilities/ui'
-import { GeistMono } from 'geist/font/mono'
-import { GeistSans } from 'geist/font/sans'
-import { Playfair_Display, Gentium_Book_Plus, Montserrat } from 'next/font/google'
-import React from 'react'
+import { cn } from "@/utilities/ui"
+import { GeistMono } from "geist/font/mono"
+import { GeistSans } from "geist/font/sans"
+import { Playfair_Display, Gentium_Book_Plus, Montserrat } from "next/font/google"
+import React from "react"
 
-import { AdminBar } from '@/components/AdminBar'
-import { Footer } from '@/Footer/Component'
-import { Header } from '@/Header/Component'
-import { Providers } from '@/providers'
-import { InitTheme } from '@/providers/Theme/InitTheme'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
-import { getTenant } from '@/utilities/getGlobals'
+import { AdminBar } from "@/components/AdminBar"
+import { Footer } from "@/Footer/Component"
+import { Header } from "@/Header/Component"
+import { Providers } from "@/providers"
+import { InitTheme } from "@/providers/Theme/InitTheme"
+import { mergeOpenGraph } from "@/utilities/mergeOpenGraph"
+import { draftMode } from "next/headers"
+import { getTenant } from "@/utilities/getGlobals"
 
-import '../globals.css'
-import { getServerSideURL } from '@/utilities/getURL'
+import "../globals.css"
+import { getServerSideURL } from "@/utilities/getURL"
 
 const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair',
-  weight: ['400', '600', '700'],
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  weight: ["400", "600", "700"],
 })
 
 const gentium = Gentium_Book_Plus({
-  subsets: ['latin'],
-  variable: '--font-gentium',
-  weight: ['400', '700'],
+  subsets: ["latin"],
+  variable: "--font-gentium",
+  weight: ["400", "700"],
 })
 
 const montserrat = Montserrat({
-  subsets: ['latin'],
-  variable: '--font-montserrat',
-  weight: ['400', '500', '700'],
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["400", "500", "700"],
 })
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
   const tenant = await getTenant()
-  const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ''
+  const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ""
 
   return (
     <html
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(getServerSideURL()),
   openGraph: mergeOpenGraph(),
   twitter: {
-    card: 'summary_large_image',
-    creator: '@payloadcms',
+    card: "summary_large_image",
+    creator: "@payloadcms",
   },
 }
