@@ -103,6 +103,7 @@ async function run() {
       await payload.update({
         collection: "users",
         id: user.id,
+        context: { isSeeding: true },
         data: {
           tenants: updatedTenants.map((id) => ({ tenant: id })),
         },
@@ -145,6 +146,7 @@ async function run() {
   payload.logger.info(`Creating Beaverdale Admin User: ${beaverdaleAdminEmail}`)
   const beaverdaleAdminUser = await payload.create({
     collection: "users",
+    context: { isSeeding: true },
     data: {
       name: "Beaverdale Admin",
       email: beaverdaleAdminEmail,
@@ -178,6 +180,7 @@ async function run() {
     await payload.update({
       collection: "users",
       id: superAdmin.id,
+      context: { isSeeding: true },
       data: {
         tenants: [...currentTenantIds.map((id) => ({ tenant: id })), { tenant: tenant.id }],
       },

@@ -196,6 +196,7 @@ ${passwordEnvKey}=${tenantPassword}
       await payload.update({
         collection: "users",
         id: user.id,
+        context: { isSeeding: true },
         data: {
           tenants: updatedTenants.map((id) => ({ tenant: id })),
         },
@@ -225,6 +226,7 @@ ${passwordEnvKey}=${tenantPassword}
   payload.logger.info(`Creating Tenant Admin User: ${tenantUsername}...`)
   const tenantAdmin = await payload.create({
     collection: "users",
+    context: { isSeeding: true },
     data: {
       name: `${slug.charAt(0).toUpperCase() + slug.slice(1)} Admin`,
       email: tenantUsername,
@@ -259,6 +261,7 @@ ${passwordEnvKey}=${tenantPassword}
     await payload.update({
       collection: "users",
       id: superAdmin.id,
+      context: { isSeeding: true },
       data: {
         tenants: [...currentTenantIds.map((id) => ({ tenant: id })), { tenant: newTenant.id }],
       },

@@ -1,17 +1,35 @@
-import { test, expect, Page } from "@playwright/test"
+import { test, expect } from "@playwright/test"
+
+function getTenantURL(baseURL: string, slug: string): string {
+  const url = new URL(baseURL)
+  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+    url.hostname = `${slug}.localhost`
+  } else {
+    url.hostname = `${slug}.${url.hostname}`
+  }
+  return url.toString()
+}
 
 test.describe("Frontend", () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
-  })
-
   test("can load homepage", async ({ page }) => {
-    await page.goto("http://localhost:3000")
+    await page.goto("/")
     await expect(page).toHaveTitle(/Payload Website Template/)
     const heading = page.locator("h1").first()
     await expect(heading).toHaveText("Payload Website Template")
+  })
+
+  test("can load NOG tenant homepage", async ({ browser, baseURL }) => {
+    const targetBaseURL = getTenantURL(baseURL || "http://localhost:3000", "nog")
+    const context = await browser.newContext({ baseURL: targetBaseURL })
+    const page = await context.newPage()
+
+    await page.goto("/")
+    await expect(page).toHaveTitle(/North Of Grand/i)
+    
+    // Verify header is present
+    const header = page.locator("header").first()
+    await expect(header).toBeVisible()
+
+    await context.close()
   })
 })
