@@ -149,6 +149,8 @@ async function run() {
       name: "Beaverdale Admin",
       email: beaverdaleAdminEmail,
       password: beaverdaleAdminPassword,
+      role: "admin",
+      status: "approved",
       tenants: [
         {
           tenant: tenant.id,

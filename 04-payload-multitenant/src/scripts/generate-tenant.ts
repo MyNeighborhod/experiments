@@ -229,6 +229,8 @@ ${passwordEnvKey}=${tenantPassword}
       name: `${slug.charAt(0).toUpperCase() + slug.slice(1)} Admin`,
       email: tenantUsername,
       password: tenantPassword,
+      role: "admin",
+      status: "approved",
       tenants: [
         {
           tenant: newTenant.id,

@@ -238,6 +238,8 @@ async function run() {
       name: "NOG Admin",
       email: nogAdminEmail,
       password: nogAdminPassword,
+      role: "admin",
+      status: "approved",
       tenants: [
         {
           tenant: tenant.id,
