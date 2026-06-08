@@ -75,6 +75,9 @@ export interface Config {
     tenants: Tenant;
     header: Header;
     footer: Footer;
+    'member-categories': MemberCategory;
+    contacts: Contact;
+    suggestions: Suggestion;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -100,6 +103,9 @@ export interface Config {
     tenants: TenantsSelect<false> | TenantsSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'member-categories': MemberCategoriesSelect<false> | MemberCategoriesSelect<true>;
+    contacts: ContactsSelect<false> | ContactsSelect<true>;
+    suggestions: SuggestionsSelect<false> | SuggestionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -452,7 +458,7 @@ export interface User {
   /**
    * Access level control for user permissions.
    */
-  role?: ('superadmin' | 'admin' | 'editor' | 'contributor') | null;
+  role?: ('superadmin' | 'admin' | 'editor' | 'contributor' | 'member') | null;
   /**
    * Approval status for registration staging area.
    */
@@ -896,6 +902,63 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member-categories".
+ */
+export interface MemberCategory {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  name: string;
+  /**
+   * The amount of dues (in credits or local currency) associated with this category.
+   */
+  duesAmount: number;
+  duesFrequency: 'monthly' | 'yearly' | 'none';
+  /**
+   * If checked, new members who register on the portal will automatically be assigned this category.
+   */
+  isDefault?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts".
+ */
+export interface Contact {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  name: string;
+  email: string;
+  phone?: string | null;
+  category: number | MemberCategory;
+  duesPaidStatus: 'unpaid' | 'paid';
+  duesPaidUntil?: string | null;
+  /**
+   * Linked user account for logging in online.
+   */
+  user?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suggestions".
+ */
+export interface Suggestion {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  title: string;
+  message: string;
+  /**
+   * The member who submitted this suggestion.
+   */
+  user: number | User;
+  status: 'unread' | 'read' | 'archived';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1116,6 +1179,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'footer';
         value: number | Footer;
+      } | null)
+    | ({
+        relationTo: 'member-categories';
+        value: number | MemberCategory;
+      } | null)
+    | ({
+        relationTo: 'contacts';
+        value: number | Contact;
+      } | null)
+    | ({
+        relationTo: 'suggestions';
+        value: number | Suggestion;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1553,6 +1628,48 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member-categories_select".
+ */
+export interface MemberCategoriesSelect<T extends boolean = true> {
+  tenant?: T;
+  name?: T;
+  duesAmount?: T;
+  duesFrequency?: T;
+  isDefault?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts_select".
+ */
+export interface ContactsSelect<T extends boolean = true> {
+  tenant?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  category?: T;
+  duesPaidStatus?: T;
+  duesPaidUntil?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suggestions_select".
+ */
+export interface SuggestionsSelect<T extends boolean = true> {
+  tenant?: T;
+  title?: T;
+  message?: T;
+  user?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

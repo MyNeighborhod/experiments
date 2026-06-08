@@ -15,6 +15,9 @@ import { plugins } from "./plugins"
 import { defaultLexical } from "@/fields/defaultLexical"
 import { getServerSideURL } from "./utilities/getURL"
 import { Tenants } from "./collections/Tenants"
+import { MemberCategories } from "./collections/MemberCategories"
+import { Contacts } from "./collections/Contacts"
+import { Suggestions } from "./collections/Suggestions"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -63,7 +66,19 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || "",
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Tenants, Header, Footer],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Tenants,
+    Header,
+    Footer,
+    MemberCategories,
+    Contacts,
+    Suggestions,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [],
   plugins,
