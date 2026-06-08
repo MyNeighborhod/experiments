@@ -5,6 +5,8 @@ import { GeistMono } from "geist/font/mono"
 import { GeistSans } from "geist/font/sans"
 import { Playfair_Display, Gentium_Book_Plus, Montserrat } from "next/font/google"
 import React from "react"
+import fs from "fs"
+import path from "path"
 
 import { AdminBar } from "@/components/AdminBar"
 import { Footer } from "@/Footer/Component"
@@ -56,6 +58,9 @@ export default async function RootLayout({
 
   const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ""
 
+  const cssFullPath = path.join(process.cwd(), "public", "css", tenantSlug, "theme.css")
+  const hasCustomCss = fs.existsSync(cssFullPath)
+
   return (
     <html
       className={cn(
@@ -72,6 +77,7 @@ export default async function RootLayout({
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        {hasCustomCss && <link href={`/css/${tenantSlug}/theme.css`} rel="stylesheet" />}
       </head>
       <body className={cn(themeClass)}>
         <Providers>
