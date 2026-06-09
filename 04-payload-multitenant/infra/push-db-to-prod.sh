@@ -7,17 +7,21 @@ set -e
 #   ./infra/push-db-to-prod.sh              # prompt before overwrite
 #   ./infra/push-db-to-prod.sh --yes        # skip confirmation
 #   ./infra/push-db-to-prod.sh --skip-media # DB only, no media rsync
+#   ./infra/push-db-to-prod.sh --no-backup  # skip prod backup (emergency only)
 #
 # Requires: .env with DATABASE_URL (local), terraform applied, SSH access to EC2.
 
 SKIP_CONFIRM=0
 SKIP_MEDIA=0
+SKIP_BACKUP=0
 SNAPSHOT_ARG=""
+PROD_BACKUP_KEEP=7
 
 for arg in "$@"; do
   case "$arg" in
     --yes) SKIP_CONFIRM=1 ;;
     --skip-media) SKIP_MEDIA=1 ;;
+    --no-backup) SKIP_BACKUP=1 ;;
     --*) ;;
     *) SNAPSHOT_ARG="$arg" ;;
   esac
@@ -115,7 +119,8 @@ echo "Uploading snapshot..."
 scp -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SNAPSHOT_PATH" "ubuntu@$IP:$REMOTE_SNAPSHOT"
 
 echo "Restoring on production (stopping app container)..."
-ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "ubuntu@$IP" bash -s <<'REMOTE'
+ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "ubuntu@$IP" \
+  SKIP_BACKUP="$SKIP_BACKUP" PROD_BACKUP_KEEP="$PROD_BACKUP_KEEP" bash -s <<'REMOTE'
 set -e
 cd /home/ubuntu/app
 
@@ -129,6 +134,29 @@ if [ -f .env ]; then
 fi
 
 sudo docker compose stop payload
+
+if [ "${SKIP_BACKUP:-0}" -eq 0 ]; then
+  BACKUP_DIR="/home/ubuntu/backups"
+  BACKUP_FILE="$BACKUP_DIR/pre-push-$(date +%Y%m%d-%H%M%S).sql"
+  mkdir -p "$BACKUP_DIR"
+
+  echo "Backing up production database before restore..."
+  sudo docker compose exec -T db pg_dump -U postgres -d "$DB_NAME" > "$BACKUP_FILE"
+
+  if [ ! -s "$BACKUP_FILE" ]; then
+    echo "Error: Production backup failed or is empty: $BACKUP_FILE"
+    sudo docker compose start payload
+    exit 1
+  fi
+
+  echo "✓ Production backup: $BACKUP_FILE ($(du -sh "$BACKUP_FILE" | cut -f1))"
+
+  # Keep the newest N backups
+  KEEP="${PROD_BACKUP_KEEP:-7}"
+  ls -1t "$BACKUP_DIR"/pre-push-*.sql 2>/dev/null | tail -n +$((KEEP + 1)) | xargs -r rm -f
+else
+  echo "WARNING: Skipping production backup (--no-backup)."
+fi
 
 echo "Recreating public schema on production..."
 sudo docker compose exec -T db psql -U postgres -d "$DB_NAME" -v ON_ERROR_STOP=1 <<'SQL'
@@ -165,6 +193,7 @@ fi
 DOMAIN=$(terraform output -raw domain_url 2>/dev/null | sed 's|https://||' || echo "$IP")
 echo "--------------------------------------------------------"
 echo "Production database updated from local."
+echo "Pre-restore backups (if any): ubuntu@$IP:/home/ubuntu/backups/pre-push-*.sql"
 echo "Visit: https://$DOMAIN"
 echo "Tip: run ./infra/deploy.sh if application code also changed."
 echo "--------------------------------------------------------"
