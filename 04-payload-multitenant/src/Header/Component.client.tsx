@@ -7,6 +7,8 @@ import React, { useEffect, useState } from "react"
 import type { Header } from "@/payload-types"
 
 import { Logo } from "@/components/Logo/Logo"
+import { shouldUseNogChrome } from "@/utilities/resolveTenantSlug"
+import { cn } from "@/utilities/ui"
 import { HeaderNav } from "./Nav"
 
 interface HeaderClientProps {
@@ -31,13 +33,20 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, tenant }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [headerTheme])
 
-  const isNog = tenant?.slug === "nog"
+  const isNog = shouldUseNogChrome(tenant)
   const logoImage = (data as any)?.logoImage
   const logoUrl = logoImage && typeof logoImage === "object" ? logoImage.url : null
+  const overDarkHero = theme === "dark"
 
   if (isNog) {
     return (
-      <header className="container relative z-20 pt-8" {...(theme ? { "data-theme": theme } : {})}>
+      <header
+        className={cn(
+          "container z-20 w-full",
+          overDarkHero ? "absolute inset-x-0 top-0 mx-auto pt-6" : "relative pt-8",
+        )}
+        {...(overDarkHero ? { "data-theme": "dark" } : theme ? { "data-theme": theme } : {})}
+      >
         <div className="flex flex-col items-center">
           {logoUrl ? (
             <Link href="/">
@@ -52,7 +61,10 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, tenant }) => {
           ) : (
             <Link
               href="/"
-              className="font-serif text-3xl font-bold tracking-widest text-[#76b3b8] mb-2"
+              className={cn(
+                "font-serif text-3xl font-bold tracking-widest mb-2 no-underline",
+                overDarkHero ? "text-white" : "text-[#76b3b8]",
+              )}
             >
               North Of Grand
             </Link>

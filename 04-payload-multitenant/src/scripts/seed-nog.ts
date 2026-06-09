@@ -118,7 +118,7 @@ async function run() {
   const existingTenant = await payload.find({
     collection: "tenants",
     where: {
-      slug: { equals: "nog" },
+      or: [{ slug: { equals: "default" } }, { slug: { equals: "nog" } }],
     },
     limit: 1,
   })
@@ -223,7 +223,7 @@ async function run() {
     collection: "tenants",
     data: {
       name: "North Of Grand Des Moines",
-      slug: "nog",
+      slug: "default",
       domain: "www.northofgranddsm.org",
       template: "light",
     },

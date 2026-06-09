@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
+import { resolveTenantSlugFromHost } from "@/utilities/resolveTenantSlug"
+
 export function middleware(request: NextRequest) {
   const url = request.nextUrl
   const pathname = url.pathname
@@ -16,32 +18,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // 2. Extract hostname
   const host = request.headers.get("host") || ""
-  const hostname = host.split(":")[0] // remove port if present
+  const hostname = host.split(":")[0]
+  const tenantSlug = resolveTenantSlugFromHost(hostname)
 
-  // 3. Resolve tenant slug (fallback to 'default')
-  const platformDomain = "blockvibe.org"
-  let tenantSlug = "default"
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-tenant-slug", tenantSlug)
 
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    tenantSlug = "default"
-  } else if (hostname.endsWith(".localhost")) {
-    // Local subdomain: e.g. nog.localhost -> "nog"
-    tenantSlug = hostname.split(".")[0]
-  } else if (hostname === `info.${platformDomain}` || hostname === platformDomain) {
-    // Platform home/default site: info.blockvibe.org -> "default"
-    tenantSlug = "default"
-  } else if (hostname.endsWith(`.${platformDomain}`)) {
-    // Platform subdomain: e.g. nog.blockvibe.org -> "nog" (matches tenant slug)
-    tenantSlug = hostname.replace(`.${platformDomain}`, "")
-  } else {
-    // Fully custom domain: e.g. www.northofgranddsm.org -> "www.northofgranddsm.org" (matches tenant domain field)
-    tenantSlug = hostname
-  }
-
-  // 4. Rewrite the URL internally to include the tenant slug
-  return NextResponse.rewrite(new URL(`/${tenantSlug}${pathname}`, request.url))
+  return NextResponse.rewrite(new URL(`/${tenantSlug}${pathname}`, request.url), {
+    request: { headers: requestHeaders },
+  })
 }
 
 export const config = {

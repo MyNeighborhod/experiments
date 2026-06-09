@@ -4,6 +4,11 @@
   color: #2a2a2a;
 }
 
+/* NOG header is taller; hero sits flush (header floats over it when data-theme="dark") */
+body[data-tenant-chrome="nog"] .high-impact-hero {
+  margin-top: 0;
+}
+
 .theme-nog p,
 .theme-nog div.paragraph {
   font-family: var(--font-gentium), serif !important;
@@ -81,4 +86,55 @@
     rgba(0, 0, 0, 0)
   );
   margin: 2.5rem 0;
+}
+
+/* High-impact hero and header-over-hero use data-theme="dark" — keep light text */
+.theme-nog [data-theme="dark"] h1,
+.theme-nog [data-theme="dark"] h2,
+.theme-nog [data-theme="dark"] h3,
+.theme-nog [data-theme="dark"] h4,
+.theme-nog [data-theme="dark"] p,
+.theme-nog [data-theme="dark"] .richText p,
+.theme-nog [data-theme="dark"] strong,
+.theme-nog [data-theme="dark"] b {
+  color: #ffffff !important;
+}
+
+.theme-nog [data-theme="dark"] a:not([class*="bg-primary"]):not([class*="bg-background"]) {
+  color: #ffffff !important;
+}
+
+.theme-nog [data-theme="dark"] a[class*="outline"] {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  background-color: transparent !important;
+}
+
+.theme-nog [data-theme="dark"] a[class*="outline"]:hover {
+  color: #42514c !important;
+  background-color: #ffffff !important;
+}
+
+.theme-nog header[data-theme="dark"] nav a,
+.theme-nog header[data-theme="dark"] nav a.nav-link {
+  color: #ffffff !important;
+}
+
+.theme-nog header[data-theme="dark"] nav a:hover,
+.theme-nog header[data-theme="dark"] nav a.nav-link:hover {
+  color: #76b3b8 !important;
+}
+
+.theme-nog header[data-theme="dark"] nav svg {
+  color: #ffffff !important;
+}
+
+.theme-nog header[data-theme="dark"] .border-t,
+.theme-nog header[data-theme="dark"] .border-b {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.theme-nog header[data-theme="dark"] > div > a.font-serif {
+  color: #ffffff !important;
+  text-decoration: none !important;
 }

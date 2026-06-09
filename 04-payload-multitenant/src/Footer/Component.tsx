@@ -5,6 +5,7 @@ import React from "react"
 import { ThemeSelector } from "@/providers/Theme/ThemeSelector"
 import { CMSLink } from "@/components/Link"
 import { Logo } from "@/components/Logo/Logo"
+import { shouldUseNogChrome } from "@/utilities/resolveTenantSlug"
 
 export async function Footer() {
   const tenantId = await getTenantId()
@@ -12,7 +13,7 @@ export async function Footer() {
   const footerData = await getCachedGlobal("footer", tenantId, 1)()
 
   const navItems = footerData?.navItems || []
-  const isNog = tenant?.slug === "nog"
+  const isNog = shouldUseNogChrome(tenant)
   const logoImage = (footerData as any)?.logoImage
   const logoUrl = logoImage && typeof logoImage === "object" ? logoImage.url : null
 

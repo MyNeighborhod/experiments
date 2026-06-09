@@ -8,9 +8,6 @@ import { getPayload } from "payload"
 import React from "react"
 import PageClient from "./page.client"
 
-export const dynamic = "force-static"
-export const revalidate = 600
-
 type Args = {
   params: Promise<{
     tenant: string
@@ -18,18 +15,23 @@ type Args = {
 }
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const tenants = await payload.find({
-    collection: "tenants",
-    limit: 1000,
-    select: {
-      slug: true,
-    },
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const tenants = await payload.find({
+      collection: "tenants",
+      limit: 1000,
+      select: {
+        slug: true,
+      },
+    })
 
-  return tenants.docs.map((doc) => ({
-    tenant: doc.slug,
-  }))
+    return tenants.docs.map((doc) => ({
+      tenant: doc.slug,
+    }))
+  } catch (error) {
+    console.warn("generateStaticParams failed in [tenant]/posts/page.tsx, returning empty list:", error)
+    return []
+  }
 }
 
 export default async function Page({ params: paramsPromise }: Args) {

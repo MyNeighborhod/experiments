@@ -3,6 +3,7 @@ dist / media
 node_modules
 .DS_Store
 .env
+.env.production
 .next
 next-env.d.ts
 .vercel
@@ -23,4 +24,12 @@ node_modules/
 
 # Database snapshots
 /dbsnapshots/
+
+# Terraform (keep .terraform.lock.hcl — commit that for reproducible provider versions)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+infra/id_rsa
+infra/*.pem
 

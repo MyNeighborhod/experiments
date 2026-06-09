@@ -16,30 +16,35 @@ import PageClient from "./page.client"
 import { LivePreviewListener } from "@/components/LivePreviewListener"
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const posts = await payload.find({
-    collection: "posts",
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    depth: 1,
-    select: {
-      slug: true,
-      tenant: true,
-    },
-  })
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const posts = await payload.find({
+      collection: "posts",
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      depth: 1,
+      select: {
+        slug: true,
+        tenant: true,
+      },
+    })
 
-  const params = posts.docs.map((doc) => {
-    const tenantSlug =
-      typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
-    return {
-      tenant: tenantSlug,
-      slug: doc.slug,
-    }
-  })
+    const params = posts.docs.map((doc) => {
+      const tenantSlug =
+        typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
+      return {
+        tenant: tenantSlug,
+        slug: doc.slug,
+      }
+    })
 
-  return params
+    return params
+  } catch (error) {
+    console.warn("generateStaticParams failed in [tenant]/posts/[slug]/page.tsx, returning empty list:", error)
+    return []
+  }
 }
 
 type Args = {

@@ -15,11 +15,15 @@ import { Providers } from "@/providers"
 import { InitTheme } from "@/providers/Theme/InitTheme"
 import { mergeOpenGraph } from "@/utilities/mergeOpenGraph"
 import { draftMode, headers } from "next/headers"
-import { getTenant } from "@/utilities/getGlobals"
+import { getTenantBySlug } from "@/utilities/getGlobals"
+import { isNorthOfGrandTenant } from "@/utilities/resolveTenantSlug"
 
 import "../globals.css"
 import { notFound } from "next/navigation"
 import { getServerSideURL } from "@/utilities/getURL"
+
+// Multitenant routing depends on request host headers; static generation causes runtime errors.
+export const dynamic = "force-dynamic"
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -48,17 +52,17 @@ export default async function RootLayout({
 }) {
   const { tenant: tenantSlug } = await params
   const { isEnabled } = await draftMode()
-  const tenant = await getTenant()
+  const tenant = await getTenantBySlug(tenantSlug)
 
-  // Trigger 404 if the requested tenant does not exist in the database (ignoring default fallback)
-
-  if (tenantSlug !== "default" && !tenant) {
+  if (!tenant) {
     return notFound()
   }
 
-  const themeClass = tenant?.slug ? `theme-${tenant.slug}` : ""
+  const useNogChrome = isNorthOfGrandTenant(tenant)
+  const themeClass = useNogChrome ? "theme-nog" : `theme-${tenant.slug}`
 
-  const cssFullPath = path.join(process.cwd(), "public", "css", tenantSlug, "theme.css")
+  const cssSlug = useNogChrome ? "nog" : tenantSlug
+  const cssFullPath = path.join(process.cwd(), "public", "css", cssSlug, "theme.css")
   const hasCustomCss = fs.existsSync(cssFullPath)
 
   return (
@@ -77,9 +81,9 @@ export default async function RootLayout({
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
-        {hasCustomCss && <link href={`/css/${tenantSlug}/theme.css`} rel="stylesheet" />}
+        {hasCustomCss && <link href={`/css/${cssSlug}/theme.css`} rel="stylesheet" />}
       </head>
-      <body className={cn(themeClass)}>
+      <body className={cn(themeClass)} data-tenant-chrome={useNogChrome ? "nog" : undefined}>
         <Providers>
           <AdminBar
             adminBarProps={{

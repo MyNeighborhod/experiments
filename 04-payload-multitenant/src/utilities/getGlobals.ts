@@ -1,64 +1,77 @@
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
-import { headers } from "next/headers"
 
-export async function getTenantId(): Promise<string | number | null> {
-  try {
-    const host = (await headers()).get("host") || ""
-    const hostname = host.split(":")[0] // remove port if present
+import { getRequestTenantSlug } from "./tenantSlugFromRequest"
+import { isDefaultNogTenant } from "./resolveTenantSlug"
 
-    const payload = await getPayload({ config: configPromise })
+async function findTenantBySlug(slug: string) {
+  const payload = await getPayload({ config: configPromise })
 
-    const tenants = await payload.find({
+  const bySlug = await payload.find({
+    collection: "tenants",
+    where: {
+      or: [{ slug: { equals: slug } }, { domain: { equals: slug } }],
+    },
+    limit: 1,
+  })
+
+  if (bySlug.docs.length > 0) {
+    return bySlug.docs[0]
+  }
+
+  // Legacy: production may still have slug `nog` before migration.
+  if (isDefaultNogTenant(slug)) {
+    const legacy = await payload.find({
       collection: "tenants",
-      where: {
-        or: [{ domain: { equals: hostname } }, { slug: { equals: hostname.split(".")[0] } }],
-      },
+      where: { slug: { equals: "nog" } },
       limit: 1,
     })
-
-    if (tenants.docs.length > 0) {
-      return tenants.docs[0].id
+    if (legacy.docs.length > 0) {
+      return legacy.docs[0]
     }
-  } catch (error) {
-    // headers() can throw during build/static page generation
   }
 
   return null
 }
 
+export async function getTenantBySlug(slug: string): Promise<any | null> {
+  try {
+    return await findTenantBySlug(slug)
+  } catch {
+    return null
+  }
+}
+
+export async function getTenantId(): Promise<string | number | null> {
+  try {
+    const slug = await getRequestTenantSlug()
+    const tenant = await findTenantBySlug(slug)
+    return tenant?.id ?? null
+  } catch {
+    return null
+  }
+}
+
 export async function getTenant(): Promise<any | null> {
   try {
-    const host = (await headers()).get("host") || ""
-    const hostname = host.split(":")[0] // remove port if present
-
-    const payload = await getPayload({ config: configPromise })
-
-    const tenants = await payload.find({
-      collection: "tenants",
-      where: {
-        or: [{ domain: { equals: hostname } }, { slug: { equals: hostname.split(".")[0] } }],
-      },
-      limit: 1,
-    })
-
-    if (tenants.docs.length > 0) {
-      return tenants.docs[0]
-    }
-  } catch (error) {
-    // headers() can throw during build/static page generation
+    const slug = await getRequestTenantSlug()
+    return await findTenantBySlug(slug)
+  } catch {
+    return null
   }
-
-  return null
 }
 
 async function getGlobal(slug: "header" | "footer", tenantId: string | number | null, depth = 0) {
   const payload = await getPayload({ config: configPromise })
 
+  if (!tenantId) {
+    return null
+  }
+
   const result = await payload.find({
     collection: slug,
-    where: tenantId ? { tenant: { equals: tenantId } } : undefined,
+    where: { tenant: { equals: tenantId } },
     depth,
     limit: 1,
   })

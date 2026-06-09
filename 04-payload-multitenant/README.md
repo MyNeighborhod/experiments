@@ -304,14 +304,27 @@ export default buildConfig({
 
 There is also a simplified [one click deploy](https://github.com/payloadcms/payload/tree/3.x/templates/with-vercel-postgres) to Vercel should you need it.
 
-### Self-hosting
+### Self-hosting (AWS EC2)
 
-Before deploying your app, you need to:
+This project includes a one-command deploy to a low-cost EC2 instance. The app image is **built on your machine** and shipped pre-compiled — the server does not run `next build`.
 
-1. Ensure your app builds and serves in production. See [Production](#production) for more details.
-2. You can then deploy Payload as you would any other Node.js or Next.js application either directly on a VPS, DigitalOcean's Apps Platform, via Coolify or more. More guides coming soon.
+**First time:**
 
-You can also deploy your app manually, check out the [deployment documentation](https://payloadcms.com/docs/production/deployment) for full details.
+```bash
+cd infra && cp terraform.tfvars.example terraform.tfvars && terraform init && terraform apply
+cp .env.production.example .env.production   # edit secrets
+./infra/deploy.sh
+```
+
+**Every deploy after that:**
+
+```bash
+./infra/deploy.sh
+```
+
+See [docs/deployment/readme.md](docs/deployment/readme.md) and [infra/README.md](infra/README.md) for the full guide (media strategy, HTTPS, troubleshooting).
+
+For other hosting options, see the [Payload deployment documentation](https://payloadcms.com/docs/production/deployment).
 
 ## Questions
 

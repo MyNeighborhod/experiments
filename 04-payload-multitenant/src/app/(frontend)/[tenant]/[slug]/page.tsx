@@ -13,36 +13,43 @@ import { generateMeta } from "@/utilities/generateMeta"
 import PageClient from "./page.client"
 import { LivePreviewListener } from "@/components/LivePreviewListener"
 import { NogInteractive } from "./NogInteractive.client"
+import { getTenantBySlug } from "@/utilities/getGlobals"
+import { isDefaultNogTenant, shouldUseNogChrome } from "@/utilities/resolveTenantSlug"
 
 export async function generateStaticParams() {
-  const payload = await getPayload({ config: configPromise })
-  const pages = await payload.find({
-    collection: "pages",
-    draft: false,
-    limit: 1000,
-    overrideAccess: false,
-    pagination: false,
-    depth: 1,
-    select: {
-      slug: true,
-      tenant: true,
-    },
-  })
-
-  const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== "home"
-    })
-    .map((doc) => {
-      const tenantSlug =
-        typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
-      return {
-        tenant: tenantSlug,
-        slug: doc.slug,
-      }
+  try {
+    const payload = await getPayload({ config: configPromise })
+    const pages = await payload.find({
+      collection: "pages",
+      draft: false,
+      limit: 1000,
+      overrideAccess: false,
+      pagination: false,
+      depth: 1,
+      select: {
+        slug: true,
+        tenant: true,
+      },
     })
 
-  return params
+    const params = pages.docs
+      ?.filter((doc) => {
+        return doc.slug !== "home"
+      })
+      .map((doc) => {
+        const tenantSlug =
+          typeof doc.tenant === "object" && doc.tenant !== null ? doc.tenant.slug : "default"
+        return {
+          tenant: tenantSlug,
+          slug: doc.slug,
+        }
+      })
+
+    return params
+  } catch (error) {
+    console.warn("generateStaticParams failed in [tenant]/[slug]/page.tsx, returning empty list:", error)
+    return []
+  }
 }
 
 type Args = {
@@ -75,7 +82,8 @@ export default async function Page({ params: paramsPromise }: Args) {
   }
 
   const { hero, layout } = page
-  const isNog = tenant === "nog"
+  const tenantRecord = await getTenantBySlug(tenant)
+  const isNog = shouldUseNogChrome(tenantRecord)
 
   if (isNog) {
     if (
@@ -187,7 +195,7 @@ const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
   const payload = await getPayload({ config: configPromise })
 
   // 1. Resolve tenant ID
-  const tenantDoc = await payload.find({
+  let tenantDoc = await payload.find({
     collection: "tenants",
     where: {
       or: [{ slug: { equals: tenant } }, { domain: { equals: tenant } }],
@@ -195,7 +203,19 @@ const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
     limit: 1,
   })
 
+  if (tenantDoc.docs.length === 0 && isDefaultNogTenant(tenant)) {
+    tenantDoc = await payload.find({
+      collection: "tenants",
+      where: { slug: { equals: "nog" } },
+      limit: 1,
+    })
+  }
+
   const tenantId = tenantDoc.docs[0]?.id
+
+  if (!tenantId) {
+    return null
+  }
 
   // 2. Query page matching slug and tenant ID
   const result = await payload.find({
@@ -205,7 +225,7 @@ const queryPageBySlug = cache(async ({ slug, tenant }: { slug: string; tenant: s
     pagination: false,
     overrideAccess: draft,
     where: {
-      and: [{ slug: { equals: slug } }, ...(tenantId ? [{ tenant: { equals: tenantId } }] : [])],
+      and: [{ slug: { equals: slug } }, { tenant: { equals: tenantId } }],
     },
   })
 
