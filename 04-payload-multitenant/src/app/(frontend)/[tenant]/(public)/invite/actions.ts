@@ -26,6 +26,10 @@ export async function acceptInviteAction(
     const tenantId =
       typeof invite.tenant === "object" && invite.tenant !== null ? invite.tenant.id : invite.tenant
 
+    if (tenantId == null) {
+      throw new Error("This invitation is missing a valid tenant.")
+    }
+
     // Create User bypassing the staging area logic via context overrides
     await payload.create({
       collection: "users",

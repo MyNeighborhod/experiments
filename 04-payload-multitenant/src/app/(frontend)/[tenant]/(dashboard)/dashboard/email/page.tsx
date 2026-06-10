@@ -16,7 +16,7 @@ export default async function EmailDashboardStub({ params }: Args) {
   })
 
   const allowedRoles = ["superadmin", "admin"]
-  if (!allowedRoles.includes(user.role)) {
+  if (!user.role || !allowedRoles.includes(user.role)) {
     redirect(`/dashboard`)
   }
   return (

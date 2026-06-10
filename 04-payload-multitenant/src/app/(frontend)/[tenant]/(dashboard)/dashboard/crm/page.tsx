@@ -19,7 +19,7 @@ export default async function CRMDashboard({ params }: Args) {
   })
 
   const allowedRoles = ["superadmin", "admin", "editor"]
-  if (!allowedRoles.includes(user.role)) {
+  if (!user.role || !allowedRoles.includes(user.role)) {
     redirect(`/dashboard`)
   }
 
