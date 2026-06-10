@@ -100,6 +100,7 @@ export const plugins: Plugin[] = [
       posts: {},
       media: {},
       search: {},
+      invites: {},
       header: {
         isGlobal: true,
       },

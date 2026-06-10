@@ -47,7 +47,10 @@ export async function generateStaticParams() {
 
     return params
   } catch (error) {
-    console.warn("generateStaticParams failed in [tenant]/[slug]/page.tsx, returning empty list:", error)
+    console.warn(
+      "generateStaticParams failed in [tenant]/[slug]/page.tsx, returning empty list:",
+      error,
+    )
     return []
   }
 }

@@ -22,13 +22,17 @@ tests/
 ## Execution Commands
 
 ### 1. Run Everything
+
 Runs both Vitest integration and Playwright E2E suites:
+
 ```bash
 pnpm test
 ```
 
 ### 2. Integration Tests (Vitest)
+
 Runs Vitest tests in the terminal:
+
 ```bash
 pnpm test:int
 ```
@@ -40,6 +44,7 @@ pnpm test:int
 You can run E2E tests locally in two ways: **Faster Mode (Pre-compiled)** or **Development Mode**.
 
 ##### Option A: Faster Mode (Pre-compiled Production) - RECOMMENDED
+
 In development mode, Next.js compiles pages dynamically on-demand. This on-demand compilation takes time and can trigger Playwright test timeouts. Building the application and starting the production server first resolves this bottleneck:
 
 1. Build the application:
@@ -56,10 +61,11 @@ In development mode, Next.js compiles pages dynamically on-demand. This on-deman
    ```
 
 ##### Option B: Development Mode (Auto-managed or Manual)
+
 If you are actively modifying the React application code and want Fast Refresh, you can run in development mode.
 
-* **Auto-managed**: Simply run `pnpm test:e2e` when no server is running on port 3000. Playwright will automatically start `pnpm dev` in the background and tear it down when finished.
-* **Manual**: If you prefer to keep the development server running:
+- **Auto-managed**: Simply run `pnpm test:e2e` when no server is running on port 3000. Playwright will automatically start `pnpm dev` in the background and tear it down when finished.
+- **Manual**: If you prefer to keep the development server running:
   1. Start the dev server:
      ```bash
      pnpm dev
@@ -72,11 +78,13 @@ If you are actively modifying the React application code and want Fast Refresh, 
 #### Running Specific Tests & Flags
 
 To run a specific test file (for example, the multi-tenant login verification):
+
 ```bash
 pnpm exec playwright test tests/e2e/multitenant.e2e.spec.ts --config=playwright.config.ts
 ```
 
 ##### Useful Flags for Local Testing:
+
 - **Headed Mode** (watch the browser perform the actions visually):
   ```bash
   pnpm exec playwright test tests/e2e/multitenant.e2e.spec.ts --config=playwright.config.ts --headed
@@ -91,11 +99,15 @@ pnpm exec playwright test tests/e2e/multitenant.e2e.spec.ts --config=playwright.
   ```
 
 #### Production/Staging URL
+
 Executes E2E tests against a remote production environment. This bypasses the local dev server compilation and does not attempt to seed the database directly from the runner.
+
 ```bash
 pnpm test:e2e:prod
 ```
-*Note: You can override the production URL dynamically in the command line:*
+
+_Note: You can override the production URL dynamically in the command line:_
+
 ```bash
 PLAYWRIGHT_BASE_URL=https://my-prod-domain.com pnpm test:e2e:prod
 ```

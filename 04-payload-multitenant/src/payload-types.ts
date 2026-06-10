@@ -75,6 +75,7 @@ export interface Config {
     tenants: Tenant;
     header: Header;
     footer: Footer;
+    invites: Invite;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -100,6 +101,7 @@ export interface Config {
     tenants: TenantsSelect<false> | TenantsSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    invites: InvitesSelect<false> | InvitesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -896,6 +898,20 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invites".
+ */
+export interface Invite {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  email: string;
+  name: string;
+  token: string;
+  status?: ('pending' | 'accepted' | 'expired') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1116,6 +1132,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'footer';
         value: number | Footer;
+      } | null)
+    | ({
+        relationTo: 'invites';
+        value: number | Invite;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1553,6 +1573,19 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invites_select".
+ */
+export interface InvitesSelect<T extends boolean = true> {
+  tenant?: T;
+  email?: T;
+  name?: T;
+  token?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

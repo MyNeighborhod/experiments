@@ -7,5 +7,7 @@ export async function Header() {
   const tenant = await getTenant()
   const headerData = await getCachedGlobal("header", tenantId, 1)()
 
+  if (!headerData) return null
+
   return <HeaderClient data={headerData} tenant={tenant} />
 }

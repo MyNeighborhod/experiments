@@ -25,7 +25,7 @@ test.describe("Frontend", () => {
 
     await page.goto("/")
     await expect(page).toHaveTitle(/North Of Grand/i)
-    
+
     // Verify header is present
     const header = page.locator("header").first()
     await expect(header).toBeVisible()

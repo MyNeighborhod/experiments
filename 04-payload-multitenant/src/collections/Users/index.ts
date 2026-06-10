@@ -6,7 +6,11 @@ import { usersBeforeChangeHook } from "./beforeChange"
 export const Users: CollectionConfig = {
   slug: "users",
   access: {
-    admin: ({ req: { user } }) => isApproved(user),
+    admin: ({ req: { user } }) =>
+      isApproved(user) &&
+      ((user as any)?.role === "superadmin" ||
+        (user as any)?.role === "admin" ||
+        (user as any)?.role === "editor"),
     create: usersCreate,
     delete: usersDelete,
     read: usersRead,

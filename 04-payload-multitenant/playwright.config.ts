@@ -37,11 +37,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"], channel: "chrome" },
     },
   ],
-  webServer: isLocal
-    ? {
-        command: "pnpm dev",
-        reuseExistingServer: true,
-        url: "http://localhost:3000",
-      }
-    : undefined,
+  webServer:
+    isLocal && !process.env.NO_WEBSERVER
+      ? {
+          command: "pnpm dev",
+          reuseExistingServer: true,
+          url: "http://localhost:3000",
+        }
+      : undefined,
 })
