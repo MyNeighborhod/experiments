@@ -6,7 +6,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <Header />
-      {children}
+      <main id="main-content">{children}</main>
       <Footer />
     </>
   )

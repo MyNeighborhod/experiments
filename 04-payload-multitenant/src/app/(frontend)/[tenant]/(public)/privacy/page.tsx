@@ -6,8 +6,8 @@ import path from "path"
 import { marked } from "marked"
 
 export const metadata: Metadata = {
-  title: "Terms of Service | BlockVibe",
-  description: "Terms of Service for BlockVibe, operated by TIDIER, LLC.",
+  title: "Privacy Policy | BlockVibe",
+  description: "Privacy Policy for BlockVibe, operated by TIDIER, LLC.",
 }
 
 interface PageProps {
@@ -16,16 +16,19 @@ interface PageProps {
   }>
 }
 
-export default async function TermsOfServicePage({ params }: PageProps) {
+export default async function PrivacyPolicyPage({ params }: PageProps) {
   const { tenant } = await params
 
-  // Enforce that the TOS is only accessible on the default/platform domain
+  // Enforce that the Privacy Policy is only accessible on the default/platform domain
   if (tenant !== "default") {
     notFound()
   }
 
   // Load and parse the markdown document
-  const filePath = path.join(process.cwd(), "src/app/(frontend)/[tenant]/(public)/terms/terms.md")
+  const filePath = path.join(
+    process.cwd(),
+    "src/app/(frontend)/[tenant]/(public)/privacy/privacy.md",
+  )
   const markdown = fs.readFileSync(filePath, "utf8")
   const html = await marked.parse(markdown)
 
@@ -41,10 +44,10 @@ export default async function TermsOfServicePage({ params }: PageProps) {
               Legal Documentation
             </span>
             <h1 className="mt-2 text-3xl sm:text-4xl font-serif font-bold text-gray-900 dark:text-white leading-tight">
-              Terms of Service
+              Privacy Policy
             </h1>
             <p className="mt-4 text-sm text-gray-500 dark:text-zinc-400">
-              Last Updated: June 7, 2026 &bull; Effective Immediately
+              Last Updated: June 10, 2026 &bull; Effective Immediately
             </p>
           </header>
 
