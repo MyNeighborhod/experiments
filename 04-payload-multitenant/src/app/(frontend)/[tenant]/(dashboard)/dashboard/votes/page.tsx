@@ -1,7 +1,24 @@
-import React from "react"
+import { redirect } from "next/navigation"
+import { getMeUser } from "@/utilities/getMeUser"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function VotesDashboardStub() {
+type Args = {
+  params: Promise<{
+    tenant: string
+  }>
+}
+
+export default async function VotesDashboardStub({ params }: Args) {
+  const { tenant: tenantSlug } = await params
+
+  const { user } = await getMeUser({
+    nullUserRedirect: `/login`,
+  })
+
+  const allowedRoles = ["superadmin", "admin"]
+  if (!allowedRoles.includes(user.role)) {
+    redirect(`/${tenantSlug}/dashboard`)
+  }
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">

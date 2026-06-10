@@ -102,7 +102,7 @@ test.describe("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", ()
     await page.waitForURL("**/dashboard")
 
     // Assert new user is logged in and sees their profile details
-    await expect(page.locator("a:has-text('Voting & Polls')")).toBeVisible()
+    await expect(page.locator("a:has-text('Overview')")).toBeVisible()
     await expect(page.getByRole("heading", { name: `Hello, ${inviteeName}` })).toBeVisible()
 
     await context.close()

@@ -22,6 +22,7 @@ export default async function DashboardPage({ params }: Args) {
 
   const tenant = await getTenantBySlug(tenantSlug)
   const isStaff = user.role === "superadmin" || user.role === "admin" || user.role === "editor"
+  const isAdmin = user.role === "superadmin" || user.role === "admin"
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -166,27 +167,30 @@ export default async function DashboardPage({ params }: Args) {
             <CardDescription>Get started with common neighborhood management tasks</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3">
-            {isStaff ? (
+            {isStaff && (
+              <Button asChild variant="outline" className="justify-start gap-2 h-11">
+                <Link href={`/${tenantSlug}/dashboard/crm`}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                  </svg>
+                  Manage Resident Directory
+                </Link>
+              </Button>
+            )}
+
+            {isAdmin && (
               <>
-                <Button asChild variant="outline" className="justify-start gap-2 h-11">
-                  <Link href={`/${tenantSlug}/dashboard/crm`}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                    </svg>
-                    Manage Resident Directory
-                  </Link>
-                </Button>
                 <Button asChild variant="outline" className="justify-start gap-2 h-11">
                   <Link href={`/${tenantSlug}/dashboard/email`}>
                     <svg
@@ -226,47 +230,12 @@ export default async function DashboardPage({ params }: Args) {
                   </Link>
                 </Button>
               </>
-            ) : (
-              <>
-                <Button asChild variant="outline" className="justify-start gap-2 h-11">
-                  <Link href={`/${tenantSlug}/dashboard/votes`}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m9 12 2 2 4-4" />
-                      <rect width="18" height="18" x="3" y="3" rx="2" />
-                    </svg>
-                    Cast Your Ballot
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="justify-start gap-2 h-11">
-                  <Link href={`/${tenantSlug}/dashboard/fundraising`}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="12" x2="12" y1="2" y2="22" />
-                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
-                    Support the Neighborhood
-                  </Link>
-                </Button>
-              </>
+            )}
+
+            {!isStaff && !isAdmin && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No quick actions available.
+              </p>
             )}
           </CardContent>
         </Card>

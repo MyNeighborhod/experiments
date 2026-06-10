@@ -146,4 +146,104 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
 
     await context.close()
   })
+
+  test("5. Editor cannot see or access fundraising and settings/support", async ({
+    browser,
+    baseURL,
+  }) => {
+    // twin-suns has seeded editor user: editor@twin-suns.blockvibe.org / editor1234
+    const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
+    const context = await browser.newContext({ baseURL: twinSunsBaseURL })
+    const page = await context.newPage()
+
+    // Login as editor
+    await page.goto("/login")
+    await page.fill("input[type='email']", "editor@twin-suns.blockvibe.org")
+    await page.fill("input[type='password']", "editor1234")
+    await page.click("button[type='submit']")
+
+    // Check we landed on dashboard
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("text=Welcome to the")).toBeVisible()
+
+    // Assert Sidebar navigation links exist for Overview, Directory
+    await expect(page.locator("a:has-text('Overview')")).toBeVisible()
+    await expect(page.locator("a:has-text('Directory (CRM)')")).toBeVisible()
+
+    // Assert "Email Broadcaster", "Voting & Polls", "Fundraising Status", and "Settings" do NOT exist in sidebar
+    await expect(page.locator("a:has-text('Email Broadcaster')")).toBeHidden()
+    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
+    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
+    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/email - should redirect back to /dashboard
+    await page.goto("/dashboard/email")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Email Broadcaster')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/votes - should redirect back to /dashboard
+    await page.goto("/dashboard/votes")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/fundraising - should redirect back to /dashboard
+    await page.goto("/dashboard/fundraising")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/settings - should redirect back to /dashboard
+    await page.goto("/dashboard/settings")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
+
+    await context.close()
+  })
+
+  test("6. Contributor cannot see or access fundraising and settings/support", async ({
+    browser,
+    baseURL,
+  }) => {
+    // twin-suns has seeded contributor user: contributor@twin-suns.blockvibe.org / contrib1234
+    const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
+    const context = await browser.newContext({ baseURL: twinSunsBaseURL })
+    const page = await context.newPage()
+
+    // Login as contributor
+    await page.goto("/login")
+    await page.fill("input[type='email']", "contributor@twin-suns.blockvibe.org")
+    await page.fill("input[type='password']", "contrib1234")
+    await page.click("button[type='submit']")
+
+    // Check we landed on dashboard
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("text=Welcome to the")).toBeVisible()
+
+    // Assert Sidebar navigation links exist for Overview
+    await expect(page.locator("a:has-text('Overview')")).toBeVisible()
+    await expect(page.locator("a:has-text('Directory (CRM)')")).toBeHidden()
+    await expect(page.locator("a:has-text('Email Broadcaster')")).toBeHidden()
+    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
+    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
+    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
+
+    // Assert "Support the Neighborhood" button on overview page is hidden
+    await expect(page.locator("text=Support the Neighborhood")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/votes - should redirect back to /dashboard
+    await page.goto("/dashboard/votes")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/fundraising - should redirect back to /dashboard
+    await page.goto("/dashboard/fundraising")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
+
+    // Attempt to navigate directly to /dashboard/settings - should redirect back to /dashboard
+    await page.goto("/dashboard/settings")
+    await page.waitForURL("**/dashboard")
+    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
+
+    await context.close()
+  })
 })

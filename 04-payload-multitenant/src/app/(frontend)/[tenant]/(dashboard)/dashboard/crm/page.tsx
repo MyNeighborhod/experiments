@@ -1,6 +1,7 @@
 import React from "react"
 import { getTenantBySlug } from "@/utilities/getGlobals"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { getMeUser } from "@/utilities/getMeUser"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { InviteModal } from "./InviteModal"
 
@@ -12,6 +13,16 @@ type Args = {
 
 export default async function CRMDashboard({ params }: Args) {
   const { tenant: tenantSlug } = await params
+
+  const { user } = await getMeUser({
+    nullUserRedirect: `/login`,
+  })
+
+  const allowedRoles = ["superadmin", "admin", "editor"]
+  if (!allowedRoles.includes(user.role)) {
+    redirect(`/${tenantSlug}/dashboard`)
+  }
+
   const tenant = await getTenantBySlug(tenantSlug)
 
   if (!tenant) {
