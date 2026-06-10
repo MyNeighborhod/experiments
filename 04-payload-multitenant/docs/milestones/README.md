@@ -5,6 +5,7 @@ Product milestones for the Blockvibe multi-tenant community platform. Each docum
 | Milestone | Title | Status |
 | --- | --- | --- |
 | [M1](./m1_community_platform.md) | Community platform (site builder, members, fundraising, voting, CRM) | Planned |
+| [M1 presentation](./m1_presentation.md) | Product demo script (video); default tenant = presentation site | Draft |
 
 ### Feature tech selections
 

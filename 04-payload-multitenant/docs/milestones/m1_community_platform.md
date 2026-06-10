@@ -303,10 +303,17 @@ Keep these visible so we do not over-build M1.
 
 ---
 
+## Product presentation
+
+Scene-by-scene demo script for the default tenant presentation site and accompanying video: [m1_presentation.md](./m1_presentation.md).
+
+---
+
 ## Dependencies & references
 
 | Topic | Doc |
 | --- | --- |
+| Demo / video script | [m1_presentation.md](./m1_presentation.md) |
 | Roles and approval | [how_roles_work.md](../how_roles_work.md) |
 | Voting tech selection (hybrid poll-forms) | [voting/tech_selection.md](./voting/tech_selection.md) |
 | CRM dashboard wireframe & email architecture | [crm/implementation_plan.md](../crm/implementation_plan.md) |
