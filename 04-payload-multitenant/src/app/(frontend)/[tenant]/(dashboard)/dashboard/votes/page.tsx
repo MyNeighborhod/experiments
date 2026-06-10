@@ -17,7 +17,7 @@ export default async function VotesDashboardStub({ params }: Args) {
 
   const allowedRoles = ["superadmin", "admin"]
   if (!allowedRoles.includes(user.role)) {
-    redirect(`/${tenantSlug}/dashboard`)
+    redirect(`/dashboard`)
   }
   return (
     <div className="space-y-6">

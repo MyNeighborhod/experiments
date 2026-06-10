@@ -199,7 +199,7 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
     await context.close()
   })
 
-  test("6. Contributor cannot see or access fundraising and settings/support", async ({
+  test("6. Contributor is redirected to profile and cannot access dashboard", async ({
     browser,
     baseURL,
   }) => {
@@ -214,35 +214,100 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
     await page.fill("input[type='password']", "contrib1234")
     await page.click("button[type='submit']")
 
-    // Check we landed on dashboard
+    // Check we landed on profile page (not dashboard)
+    await page.waitForURL("**/profile")
+    await expect(page.locator("text=Twin Suns Contributor").first()).toBeVisible()
+    await expect(page.getByText("contributor", { exact: true })).toBeVisible()
+    await expect(page.getByText("Neighbor", { exact: true })).toBeVisible()
+
+    // Attempt to navigate directly to /dashboard - should redirect back to /profile
+    await page.goto("/dashboard")
+    await page.waitForURL("**/profile")
+
+    // Attempt to navigate directly to /dashboard/crm - should redirect back to /profile
+    await page.goto("/dashboard/crm")
+    await page.waitForURL("**/profile")
+
+    // Attempt to navigate directly to /dashboard/votes - should redirect back to /profile
+    await page.goto("/dashboard/votes")
+    await page.waitForURL("**/profile")
+
+    // Attempt to navigate directly to /dashboard/fundraising - should redirect back to /profile
+    await page.goto("/dashboard/fundraising")
+    await page.waitForURL("**/profile")
+
+    // Attempt to navigate directly to /dashboard/settings - should redirect back to /profile
+    await page.goto("/dashboard/settings")
+    await page.waitForURL("**/profile")
+
+    await context.close()
+  })
+
+  test("7. Contributor can login and see their own profile page directly", async ({
+    browser,
+    baseURL,
+  }) => {
+    const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
+    const context = await browser.newContext({ baseURL: twinSunsBaseURL })
+    const page = await context.newPage()
+
+    // Login as contributor
+    await page.goto("/login")
+    await page.fill("input[type='email']", "contributor@twin-suns.blockvibe.org")
+    await page.fill("input[type='password']", "contrib1234")
+    await page.click("button[type='submit']")
+
+    // Check we landed on profile page
+    await page.waitForURL("**/profile")
+    await expect(page.locator("text=Twin Suns Contributor").first()).toBeVisible()
+    await expect(page.getByText("contributor", { exact: true })).toBeVisible()
+    await expect(page.getByText("Neighbor", { exact: true })).toBeVisible()
+
+    // Assert that the Admin Dashboard link is NOT visible for contributors
+    await expect(page.locator("text=Go to Admin Dashboard")).toBeHidden()
+
+    await context.close()
+  })
+
+  test("8. NOG Admin can login, navigate to profile page, see details, and return to dashboard", async ({
+    browser,
+  }) => {
+    const context = await browser.newContext({ baseURL: nogBaseURL })
+    const page = await context.newPage()
+
+    const email = process.env.TENANT_NOG_USERNAME
+    const password = process.env.TENANT_NOG_PASSWORD
+
+    if (!email || !password) {
+      throw new Error("TENANT_NOG_USERNAME or TENANT_NOG_PASSWORD not defined in env")
+    }
+
+    // Login as NOG Admin
+    await page.goto("/login")
+    await page.fill("input[type='email']", email)
+    await page.fill("input[type='password']", password)
+    await page.click("button[type='submit']")
+
+    // Should land on dashboard
     await page.waitForURL("**/dashboard")
     await expect(page.locator("text=Welcome to the")).toBeVisible()
 
-    // Assert Sidebar navigation links exist for Overview
-    await expect(page.locator("a:has-text('Overview')")).toBeVisible()
-    await expect(page.locator("a:has-text('Directory (CRM)')")).toBeHidden()
-    await expect(page.locator("a:has-text('Email Broadcaster')")).toBeHidden()
-    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
-    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
-    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
+    // Navigate to profile page
+    await page.goto("/profile")
+    await page.waitForURL("**/profile")
 
-    // Assert "Support the Neighborhood" button on overview page is hidden
-    await expect(page.locator("text=Support the Neighborhood")).toBeHidden()
+    // Assert profile page elements
+    await expect(page.locator("text=NOG Admin").first()).toBeVisible()
+    await expect(page.getByText("admin", { exact: true })).toBeVisible()
+    await expect(page.getByText("Neighbor", { exact: true })).toBeVisible()
 
-    // Attempt to navigate directly to /dashboard/votes - should redirect back to /dashboard
-    await page.goto("/dashboard/votes")
+    // Assert that the Go to Admin Dashboard link is visible and clickable
+    const dashboardLink = page.locator("text=Go to Admin Dashboard")
+    await expect(dashboardLink).toBeVisible()
+    await dashboardLink.click()
+
+    // Assert we returned to dashboard
     await page.waitForURL("**/dashboard")
-    await expect(page.locator("a:has-text('Voting & Polls')")).toBeHidden()
-
-    // Attempt to navigate directly to /dashboard/fundraising - should redirect back to /dashboard
-    await page.goto("/dashboard/fundraising")
-    await page.waitForURL("**/dashboard")
-    await expect(page.locator("a:has-text('Fundraising Status')")).toBeHidden()
-
-    // Attempt to navigate directly to /dashboard/settings - should redirect back to /dashboard
-    await page.goto("/dashboard/settings")
-    await page.waitForURL("**/dashboard")
-    await expect(page.locator("a:has-text('Settings')")).toBeHidden()
 
     await context.close()
   })

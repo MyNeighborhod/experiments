@@ -56,6 +56,14 @@ export const Users: CollectionConfig = {
         description: "Approval status for registration staging area.",
       },
     },
+    {
+      name: "isNeighbor",
+      type: "checkbox",
+      defaultValue: true,
+      admin: {
+        description: "Designates whether the user is a resident neighbor of the community.",
+      },
+    },
   ],
   timestamps: true,
 }

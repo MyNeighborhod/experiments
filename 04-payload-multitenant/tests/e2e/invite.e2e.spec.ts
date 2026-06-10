@@ -99,11 +99,12 @@ test.describe("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", ()
     await page.click("button[type='submit']")
 
     // Check redirection to dashboard/profile
-    await page.waitForURL("**/dashboard")
+    await page.waitForURL("**/profile")
 
     // Assert new user is logged in and sees their profile details
-    await expect(page.locator("a:has-text('Overview')")).toBeVisible()
-    await expect(page.getByRole("heading", { name: `Hello, ${inviteeName}` })).toBeVisible()
+    await expect(page.locator(`text=${inviteeName}`).first()).toBeVisible()
+    await expect(page.getByText("contributor", { exact: true })).toBeVisible()
+    await expect(page.getByText("Neighbor", { exact: true })).toBeVisible()
 
     await context.close()
   })

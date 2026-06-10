@@ -20,7 +20,7 @@ export default async function CRMDashboard({ params }: Args) {
 
   const allowedRoles = ["superadmin", "admin", "editor"]
   if (!allowedRoles.includes(user.role)) {
-    redirect(`/${tenantSlug}/dashboard`)
+    redirect(`/dashboard`)
   }
 
   const tenant = await getTenantBySlug(tenantSlug)

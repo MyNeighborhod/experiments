@@ -18,7 +18,7 @@ export default async function FundraisingDashboardStub({ params }: Args) {
 
   const allowedRoles = ["superadmin", "admin"]
   if (!allowedRoles.includes(user.role)) {
-    redirect(`/${tenantSlug}/dashboard`)
+    redirect(`/dashboard`)
   }
 
   return (

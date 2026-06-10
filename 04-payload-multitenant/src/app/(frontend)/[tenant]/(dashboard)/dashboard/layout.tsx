@@ -27,6 +27,12 @@ export default async function DashboardLayout({ children, params }: Args) {
     redirect(`/logout`)
   }
 
+  // 2.5 Security validation: Ensure only staff can access the dashboard portal
+  const isStaff = user.role === "superadmin" || user.role === "admin" || user.role === "editor"
+  if (!isStaff) {
+    redirect(`/profile`)
+  }
+
   // 3. Resolve tenant details
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) {

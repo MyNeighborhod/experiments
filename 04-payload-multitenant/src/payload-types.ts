@@ -459,6 +459,10 @@ export interface User {
    * Approval status for registration staging area.
    */
   status?: ('pending' | 'approved' | 'rejected') | null;
+  /**
+   * Designates whether the user is a resident neighbor of the community.
+   */
+  isNeighbor?: boolean | null;
   tenants?:
     | {
         tenant: number | Tenant;
@@ -1493,6 +1497,7 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   role?: T;
   status?: T;
+  isNeighbor?: T;
   tenants?:
     | T
     | {
