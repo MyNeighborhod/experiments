@@ -8,6 +8,45 @@ Audit of the current self-hosted deployment pipeline and a prioritized backlog o
 
 ---
 
+## Progress
+
+| # | Item | Status |
+| --- | --- | --- |
+| — | **v1 pipeline** (Terraform, deploy, push-db, docs) | ✅ Shipped |
+| 1 | Prod backup before DB push | ✅ Done |
+| 2 | SSH open to the world | ⬜ Open |
+| 3 | Terraform state local only | ⬜ Open |
+| 4 | No rollback on bad deploys | ⬜ Open |
+| 5 | Full downtime on every deploy | ⬜ Open |
+| 6 | Preflight after Docker build (`deploy.sh`) | ⬜ Open |
+| 7 | Caddyfile duplicated | ⬜ Open |
+| 8 | `.env` uploaded on every deploy | ⬜ Open |
+| 9 | `StrictHostKeyChecking=no` | ⬜ Open |
+| 10 | No post-deploy health check | ⬜ Open |
+| 11 | No CI/CD | ⬜ Open |
+| 12 | No `pull-prod-db` | ⬜ Open |
+| 13 | Image transport via `tar.gz` | ⬜ Acceptable for now |
+| 14 | Postgres not backed up automatically (nightly) | ⬜ Open |
+| 15 | `docker-compose.yml` has no healthchecks | ⬜ Open |
+
+**Phase 1 (safety):** 1 of 4 done — next up: preflight (#6), smoke test (#10), payload-only recreate (#5).
+
+---
+
+## Shipped (v1 baseline)
+
+Already in production before this roadmap; keep as-is.
+
+| Area | What shipped |
+| --- | --- |
+| **Infra** | Terraform EC2 + EIP + Cloudflare DNS; `userdata.sh` (Docker, Caddy, swap) |
+| **Deploy** | `deploy.sh` (local `linux/amd64` build → SCP → compose up); `--skip-media` |
+| **Data sync** | `push-db-to-prod.sh` (local → prod DB + media); `sync-media.sh` |
+| **Local DB workflow** | `pnpm db:snapshot:local`, `pnpm db:restore:local`, `dbsnapshots/` |
+| **Docs** | `docs/deployment/readme.md`, `infra/README.md` |
+
+---
+
 ## Current pipeline
 
 ```mermaid
@@ -44,7 +83,7 @@ flowchart LR
 | Script | Purpose |
 | --- | --- |
 | `infra/deploy.sh` | App image, compose, Caddy, env, optional media |
-| `infra/push-db-to-prod.sh` | Replace prod DB from local snapshot + optional media |
+| `infra/push-db-to-prod.sh` | Replace prod DB from local snapshot + optional media; auto-backup prod first |
 | `infra/sync-media.sh` | Media-only rsync |
 
 ### What works well (keep)
@@ -64,19 +103,16 @@ Items are ordered by severity. Effort estimates assume a single developer famili
 
 ---
 
-### 1. No prod backup before DB push
+### 1. ~~No prod backup before DB push~~ ✅ Done
 
 **Risk:** High — `push-db-to-prod.sh` runs `DROP SCHEMA public CASCADE`. A failed restore leaves production empty (this already happened once).
 
-**Possible solutions:**
+**Implemented (2026-06-09):** Option A in `push-db-to-prod.sh`.
 
-| Option | Description | Effort |
-| --- | --- | --- |
-| **A. Auto-backup in script** | Before drop, `pg_dump` prod to `/home/ubuntu/backups/pre-push-YYYYMMDD-HHMMSS.sql` on EC2; keep last N backups. | ~30 min |
-| **B. Manual backup step in docs** | Document `ssh` + `pg_dump` before every push. Cheap but easy to skip. | ~10 min |
-| **C. EBS snapshot** | AWS snapshot of the root volume before destructive ops. Slower, broader recovery. | ~1 hr |
-
-**Recommendation:** A — automate in `push-db-to-prod.sh`; add `--no-backup` only for emergencies.
+- Before `DROP SCHEMA`, dumps prod to `/home/ubuntu/backups/pre-push-YYYYMMDD-HHMMSS.sql`
+- Aborts restore if backup is empty; restarts `payload` on failure
+- Rotates to the 7 newest `pre-push-*.sql` files
+- `--no-backup` flag for emergencies only
 
 ---
 
@@ -305,7 +341,7 @@ Items are ordered by severity. Effort estimates assume a single developer famili
 
 ### Phase 1 — Safety (≈ half day)
 
-1. Prod backup before DB push (#1)
+1. ~~Prod backup before DB push (#1)~~ ✅
 2. Preflight at top of `deploy.sh` (#6)
 3. Post-deploy curl smoke test (#10)
 4. Recreate `payload` only on code deploy (#5)
@@ -347,4 +383,5 @@ Items are ordered by severity. Effort estimates assume a single developer famili
 
 | Date | Change |
 | --- | --- |
+| 2026-06-09 | Mark #1 done (auto prod backup in `push-db-to-prod.sh`); add progress table and v1 baseline section |
 | 2026-06-09 | Initial audit and roadmap from v1 pipeline review |
