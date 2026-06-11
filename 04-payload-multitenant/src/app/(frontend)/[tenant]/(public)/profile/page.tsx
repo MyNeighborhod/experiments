@@ -50,6 +50,12 @@ export default async function ProfilePage({ params }: Args) {
                 </span>
               </div>
             )}
+            {(user as any).household && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Household:</span>
+                <span className="font-semibold text-foreground">{(user as any).household}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Member Since:</span>
               <span className="text-foreground">

@@ -20,7 +20,7 @@ test.describe("Legal Pages (Terms of Service & Privacy Policy)", () => {
     await expect(mainHeading).toHaveText("Terms of Service")
 
     // Check that sections rendered from terms.md are present
-    const firstSectionHeading = page.locator("h3").first()
+    const firstSectionHeading = page.locator("h2").first()
     await expect(firstSectionHeading).toHaveText("1. Legal Entity & Binding Agreement")
 
     // Check custom anti-spam policies we added are present in the DOM
@@ -36,7 +36,7 @@ test.describe("Legal Pages (Terms of Service & Privacy Policy)", () => {
     const mainHeading = page.locator("h1")
     await expect(mainHeading).toHaveText("Privacy Policy")
 
-    const firstSectionHeading = page.locator("h3").first()
+    const firstSectionHeading = page.locator("h2").first()
     await expect(firstSectionHeading).toHaveText("1. Information We Collect")
 
     // Check that it mentions our anti-abuse SNS webhooks

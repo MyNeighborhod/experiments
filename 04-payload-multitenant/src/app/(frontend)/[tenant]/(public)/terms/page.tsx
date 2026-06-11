@@ -5,6 +5,8 @@ import fs from "fs"
 import path from "path"
 import { marked } from "marked"
 
+import { headers } from "next/headers"
+
 export const metadata: Metadata = {
   title: "Terms of Service | BlockVibe",
   description: "Terms of Service for BlockVibe, operated by TIDIER, LLC.",
@@ -20,7 +22,17 @@ export default async function TermsOfServicePage({ params }: PageProps) {
   const { tenant } = await params
 
   // Enforce that the TOS is only accessible on the default/platform domain
-  if (tenant !== "default") {
+  const headersList = await headers()
+  const host = headersList.get("host") || ""
+  const hostname = host.split(":")[0]
+
+  const isPlatformDomain =
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "blockvibe.org" ||
+    hostname === "info.blockvibe.org"
+
+  if (tenant !== "default" || !isPlatformDomain) {
     notFound()
   }
 

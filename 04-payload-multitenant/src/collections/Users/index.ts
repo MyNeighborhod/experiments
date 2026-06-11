@@ -64,6 +64,13 @@ export const Users: CollectionConfig = {
         description: "Designates whether the user is a resident neighbor of the community.",
       },
     },
+    {
+      name: "household",
+      type: "text",
+      admin: {
+        description: "The household this user belongs to.",
+      },
+    },
   ],
   timestamps: true,
 }

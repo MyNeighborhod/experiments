@@ -105,58 +105,77 @@ async function run() {
 
   payload.logger.info("Initializing Seeding for NOG (North Of Grand)...")
 
-  // Clean up existing NOG admin user if they exist
+  // Clean up existing NOG admin and neighbor users if they exist
   const nogAdminEmail = process.env.TENANT_NOG_USERNAME || "admin@nog.blockvibe.org"
+  const nogNeighborEmail =
+    process.env.TENANT_NOG_NEIGHBOR_USERNAME || "neighbor_john@nog.blockvibe.org"
+  const nogNeighborJohannaEmail =
+    process.env.TENANT_NOG_NEIGHBOR_JOHANNA_USERNAME || "neighbor_johanna@nog.blockvibe.org"
   await payload.delete({
     collection: "users",
     where: {
-      email: { equals: nogAdminEmail },
+      or: [
+        { email: { equals: nogAdminEmail } },
+        { email: { equals: nogNeighborEmail } },
+        { email: { equals: nogNeighborJohannaEmail } },
+      ],
     },
   })
 
   // 1. Clean up existing NOG Tenant data
-  const existingTenant = await payload.find({
+  const existingTenants = await payload.find({
     collection: "tenants",
     where: {
       or: [{ slug: { equals: "default" } }, { slug: { equals: "nog" } }],
     },
-    limit: 1,
+    limit: 100,
   })
 
-  if (existingTenant.docs.length > 0) {
-    const tenant = existingTenant.docs[0]
+  for (const tenant of existingTenants.docs) {
     payload.logger.info(`Cleaning up existing data for NOG Tenant ID: ${tenant.id}...`)
 
+    console.log("Deleting pages...")
     await payload.delete({
       collection: "pages",
       where: { tenant: { equals: tenant.id } },
       context: { disableRevalidate: true },
     })
 
+    console.log("Deleting posts...")
     await payload.delete({
       collection: "posts",
       where: { tenant: { equals: tenant.id } },
       context: { disableRevalidate: true },
     })
 
+    console.log("Deleting media...")
     await payload.delete({
       collection: "media",
       where: { tenant: { equals: tenant.id } },
     })
 
+    console.log("Deleting headers...")
     await payload.delete({
       collection: "header",
       where: { tenant: { equals: tenant.id } },
       context: { disableRevalidate: true },
     })
 
+    console.log("Deleting footers...")
     await payload.delete({
       collection: "footer",
       where: { tenant: { equals: tenant.id } },
       context: { disableRevalidate: true },
     })
 
+    console.log("Deleting invites...")
+    await payload.delete({
+      collection: "invites",
+      where: { tenant: { equals: tenant.id } },
+    })
+
     // Find all users linked to this tenant and remove the association first
+    console.log("Finding tenant users...")
     const usersToUpdate = await payload.find({
       collection: "users",
       where: {
@@ -165,6 +184,7 @@ async function run() {
       limit: 1000,
     })
 
+    console.log(`Updating ${usersToUpdate.docs.length} users to remove tenant mapping...`)
     for (const user of usersToUpdate.docs) {
       const updatedTenants = (user.tenants || [])
         .map((t: any) =>
@@ -182,11 +202,12 @@ async function run() {
       })
     }
 
+    console.log("Deleting tenant...")
     await payload.delete({
       collection: "tenants",
       id: tenant.id,
     })
-    payload.logger.info("Old NOG Tenant data cleaned.")
+    payload.logger.info(`Old NOG Tenant ID ${tenant.id} cleaned.`)
   }
 
   // 2. Fetch media assets from the live site
@@ -229,8 +250,9 @@ async function run() {
     },
   })
 
-  // 4. Create tenant-specific admin user & link superadmin
+  // 4. Create tenant-specific admin user, neighbor user & link superadmin
   const nogAdminPassword = process.env.TENANT_NOG_PASSWORD || "password1234"
+  const nogNeighborPassword = process.env.TENANT_NOG_NEIGHBOR_PASSWORD || "neighbor1234"
 
   payload.logger.info(`Creating NOG Admin User: ${nogAdminEmail}`)
   await payload.create({
@@ -242,6 +264,49 @@ async function run() {
       password: nogAdminPassword,
       role: "admin",
       status: "approved",
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
+  })
+
+  payload.logger.info(`Creating NOG Neighbor User: ${nogNeighborEmail}`)
+  await payload.create({
+    collection: "users",
+    context: { isSeeding: true },
+    data: {
+      name: "John Neighbor",
+      email: nogNeighborEmail,
+      password: nogNeighborPassword,
+      role: "contributor",
+      status: "approved",
+      isNeighbor: true,
+      household: "John & Johanna Household",
+      tenants: [
+        {
+          tenant: tenant.id,
+        },
+      ],
+    },
+  })
+
+  const nogNeighborJohannaPassword =
+    process.env.TENANT_NOG_NEIGHBOR_JOHANNA_PASSWORD || "neighbor1234"
+
+  payload.logger.info(`Creating NOG Neighbor Wife User: ${nogNeighborJohannaEmail}`)
+  await payload.create({
+    collection: "users",
+    context: { isSeeding: true },
+    data: {
+      name: "Johanna Neighbor",
+      email: nogNeighborJohannaEmail,
+      password: nogNeighborJohannaPassword,
+      role: "contributor",
+      status: "approved",
+      isNeighbor: true,
+      household: "John & Johanna Household",
       tenants: [
         {
           tenant: tenant.id,
@@ -357,7 +422,7 @@ async function run() {
                 richParagraph(
                   "Welcome to the Historic District of North of Grand. The neighborhood is nestled in the heart of Des Moines, Iowa between 31st & 42nd street from Hwy 235 to Grand Ave.",
                 ),
-                richHeading("North of Grand Neighborhood Association"),
+                richHeading("North of Grand Neighborhood Association", "h1"),
                 richHeading("Mission Statement", "h3"),
                 richParagraph(
                   "Our Mission is to strengthen relationships and improve quality of life for all residents and businesses in the North of Grand neighborhood. We commit to enhancing livability and revitalizing our historic neighborhood through opportunities of civic engagement. We advocate on behalf of North of Grand’s diverse residents as a liaison with local governments to preserve and uphold our community’s vibrant characteristics.",

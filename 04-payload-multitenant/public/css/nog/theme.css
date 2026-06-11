@@ -49,7 +49,7 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
 }
 
 .theme-nog a {
-  color: #0a3840;
+  /* color: #0a3840; */
   text-decoration: underline;
   transition: color 0.2s ease;
 }
@@ -102,6 +102,10 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
 
 .theme-nog [data-theme="dark"] a:not([class*="bg-primary"]):not([class*="bg-background"]) {
   color: #ffffff !important;
+}
+
+.text-primary-foreground a {
+  color: #ffffff;
 }
 
 .theme-nog [data-theme="dark"] a[class*="outline"] {

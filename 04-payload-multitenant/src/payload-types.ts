@@ -463,6 +463,10 @@ export interface User {
    * Designates whether the user is a resident neighbor of the community.
    */
   isNeighbor?: boolean | null;
+  /**
+   * The household this user belongs to.
+   */
+  household?: string | null;
   tenants?:
     | {
         tenant: number | Tenant;
@@ -1498,6 +1502,7 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   status?: T;
   isNeighbor?: T;
+  household?: T;
   tenants?:
     | T
     | {

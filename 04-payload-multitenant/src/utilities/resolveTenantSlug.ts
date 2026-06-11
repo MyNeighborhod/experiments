@@ -7,7 +7,8 @@ export function resolveTenantSlugFromHost(hostname: string): string {
   }
 
   if (hostname.endsWith(".localhost")) {
-    return hostname.split(".")[0]
+    const slug = hostname.split(".")[0]
+    return slug === "nog" ? "default" : slug
   }
 
   if (hostname === `info.${PLATFORM_DOMAIN}` || hostname === PLATFORM_DOMAIN) {
@@ -15,7 +16,8 @@ export function resolveTenantSlugFromHost(hostname: string): string {
   }
 
   if (hostname.endsWith(`.${PLATFORM_DOMAIN}`)) {
-    return hostname.replace(`.${PLATFORM_DOMAIN}`, "")
+    const slug = hostname.replace(`.${PLATFORM_DOMAIN}`, "")
+    return slug === "nog" ? "default" : slug
   }
 
   return hostname
