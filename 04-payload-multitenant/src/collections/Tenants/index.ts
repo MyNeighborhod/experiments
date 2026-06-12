@@ -43,6 +43,7 @@ export const Tenants: CollectionConfig = {
       options: [
         { label: "Light Theme", value: "light" },
         { label: "Dark Theme", value: "dark" },
+        { label: "System Preference (Auto)", value: "auto" },
       ],
       admin: {
         description: "Visual template layout for this tenant.",

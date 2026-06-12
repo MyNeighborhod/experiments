@@ -40,15 +40,17 @@ export const ThemeProvider = ({
   }, [])
 
   useEffect(() => {
-    let themeToSet: Theme = defaultThemeProp || defaultTheme
+    let themeToSet: Theme | "auto" = defaultThemeProp || defaultTheme
     const preference = window.localStorage.getItem(themeLocalStorageKey)
 
     if (themeIsValid(preference)) {
       themeToSet = preference
-    } else if (preference === "auto") {
+    } else if (preference === "auto" || themeToSet === "auto") {
       const implicitPreference = getImplicitPreference()
       if (implicitPreference) {
         themeToSet = implicitPreference
+      } else {
+        themeToSet = defaultTheme
       }
     }
 

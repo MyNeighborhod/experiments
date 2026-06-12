@@ -27,7 +27,7 @@ export const InitTheme: React.FC<{ defaultTheme?: string }> = ({ defaultTheme = 
 
     if (preference === 'light' || preference === 'dark') {
       themeToSet = preference
-    } else if (preference === 'auto') {
+    } else if (preference === 'auto' || themeToSet === 'auto') {
       var implicitPreference = getImplicitPreference()
       if (implicitPreference) {
         themeToSet = implicitPreference

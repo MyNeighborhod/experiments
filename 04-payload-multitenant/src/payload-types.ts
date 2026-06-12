@@ -241,7 +241,7 @@ export interface Tenant {
   /**
    * Visual template layout for this tenant.
    */
-  template?: ('light' | 'dark') | null;
+  template?: ('light' | 'dark' | 'auto') | null;
   updatedAt: string;
   createdAt: string;
 }

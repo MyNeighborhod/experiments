@@ -76,13 +76,13 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <InitTheme defaultTheme={tenant.template || "light"} />
+        <InitTheme defaultTheme={tenant.template || "auto"} />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {hasCustomCss && <link href={`/css/${cssSlug}/theme.css`} rel="stylesheet" />}
       </head>
       <body className={cn(themeClass)} data-tenant-chrome={useNogChrome ? "nog" : undefined}>
-        <Providers theme={tenant.template as any}>
+        <Providers theme={(tenant.template || "auto") as any}>
           <AdminBar
             adminBarProps={{
               preview: isEnabled,
