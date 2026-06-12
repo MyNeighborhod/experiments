@@ -142,3 +142,45 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
   color: #ffffff !important;
   text-decoration: none !important;
 }
+
+/* Dark mode styles for interactive content cards on NOG tenant */
+[data-theme="dark"] .theme-nog div.bg-white {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white h3,
+[data-theme="dark"] .theme-nog div.bg-white label {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white p {
+  color: #d4d4d8 !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white p.text-gray-400,
+[data-theme="dark"] .theme-nog div.bg-white label.text-gray-500 {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white input,
+[data-theme="dark"] .theme-nog div.bg-white textarea {
+  background-color: #09090b !important;
+  color: #ffffff !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white input::placeholder,
+[data-theme="dark"] .theme-nog div.bg-white textarea::placeholder {
+  color: #71717a !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white a.bg-teal-50 {
+  background-color: rgba(20, 184, 166, 0.1) !important;
+  color: #5eead4 !important;
+}
+
+[data-theme="dark"] .theme-nog div.bg-white .bg-teal-50 {
+  background-color: rgba(20, 184, 166, 0.05) !important;
+  border-color: rgba(20, 184, 166, 0.2) !important;
+}
