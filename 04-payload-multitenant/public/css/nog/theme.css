@@ -28,7 +28,7 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
 .theme-nog h4,
 .theme-nog .hero h1 {
   font-family: var(--font-playfair), serif !important;
-  color: #42514c !important;
+  color: #42514c;
   font-weight: 600 !important;
 }
 
@@ -150,7 +150,7 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
 }
 
 [data-theme="dark"] .theme-nog div.bg-white h3 {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .theme-nog div.bg-white label {
