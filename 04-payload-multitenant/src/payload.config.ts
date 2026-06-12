@@ -17,6 +17,7 @@ import { getServerSideURL } from "./utilities/getURL"
 import { Tenants } from "./collections/Tenants"
 import { Invites } from "./collections/Invites"
 import { TenantRequests } from "./collections/TenantRequests"
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer"
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -63,6 +64,21 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || "",
+    },
+  }),
+  email: nodemailerAdapter({
+    defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "info@blockvibe.org",
+    defaultFromName: process.env.SMTP_FROM_NAME || "BlockVibe",
+    transportOptions: {
+      host: process.env.SMTP_HOST || "localhost",
+      port: parseInt(process.env.SMTP_PORT || "1025", 10),
+      secure: process.env.SMTP_SECURE === "true",
+      auth: process.env.SMTP_USER
+        ? {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS || "",
+          }
+        : undefined,
     },
   }),
   collections: [Pages, Posts, Media, Categories, Users, Tenants, Header, Footer, Invites, TenantRequests],
