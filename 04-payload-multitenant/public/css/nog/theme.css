@@ -119,26 +119,26 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
   background-color: #ffffff !important;
 }
 
-.theme-nog header[data-theme="dark"] nav a,
-.theme-nog header[data-theme="dark"] nav a.nav-link {
+[data-theme="dark"] .theme-nog header nav a,
+[data-theme="dark"] .theme-nog header nav a.nav-link {
   color: #ffffff !important;
 }
 
-.theme-nog header[data-theme="dark"] nav a:hover,
-.theme-nog header[data-theme="dark"] nav a.nav-link:hover {
+[data-theme="dark"] .theme-nog header nav a:hover,
+[data-theme="dark"] .theme-nog header nav a.nav-link:hover {
   color: #76b3b8 !important;
 }
 
-.theme-nog header[data-theme="dark"] nav svg {
+[data-theme="dark"] .theme-nog header nav svg {
   color: #ffffff !important;
 }
 
-.theme-nog header[data-theme="dark"] .border-t,
-.theme-nog header[data-theme="dark"] .border-b {
+[data-theme="dark"] .theme-nog header .border-t,
+[data-theme="dark"] .theme-nog header .border-b {
   border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-.theme-nog header[data-theme="dark"] > div > a.font-serif {
+[data-theme="dark"] .theme-nog header > div > a.font-serif {
   color: #ffffff !important;
   text-decoration: none !important;
 }
