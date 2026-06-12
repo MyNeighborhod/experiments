@@ -149,18 +149,21 @@ body[data-tenant-chrome="nog"] .high-impact-hero {
   border-color: var(--border);
 }
 
-[data-theme="dark"] .theme-nog div.bg-white h3,
+[data-theme="dark"] .theme-nog div.bg-white h3 {
+  color: #ffffff !important;
+}
+
 [data-theme="dark"] .theme-nog div.bg-white label {
   color: #ffffff;
 }
 
 [data-theme="dark"] .theme-nog div.bg-white p {
-  color: #d4d4d8;
+  color: #d4d4d8 !important;
 }
 
 [data-theme="dark"] .theme-nog div.bg-white p.text-gray-400,
 [data-theme="dark"] .theme-nog div.bg-white label.text-gray-500 {
-  color: #a1a1aa;
+  color: #a1a1aa !important;
 }
 
 [data-theme="dark"] .theme-nog div.bg-white input,
