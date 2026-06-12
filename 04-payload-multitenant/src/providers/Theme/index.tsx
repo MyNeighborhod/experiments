@@ -27,7 +27,6 @@ export const ThemeProvider = ({
   )
 
   const setTheme = useCallback((themeToSet: Theme | "auto" | null) => {
-    console.log("setTheme is called with ", themeToSet)
     if (themeToSet === null || themeToSet === "auto") {
       window.localStorage.setItem(themeLocalStorageKey, "auto")
       const implicitPreference = getImplicitPreference()
