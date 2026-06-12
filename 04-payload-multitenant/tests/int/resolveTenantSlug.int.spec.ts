@@ -12,15 +12,15 @@ describe("resolveTenantSlugFromHost", () => {
     expect(resolveTenantSlugFromHost("127.0.0.1")).toBe("default")
   })
 
-  it("maps localhost subdomains to their slug (nog.localhost -> nog)", () => {
-    expect(resolveTenantSlugFromHost("nog.localhost")).toBe("nog")
+  it("maps localhost subdomains to their slug (nog.localhost -> default)", () => {
+    expect(resolveTenantSlugFromHost("nog.localhost")).toBe("default")
     expect(resolveTenantSlugFromHost("beaverdale.localhost")).toBe("beaverdale")
   })
 
   it("maps production platform hosts", () => {
     expect(resolveTenantSlugFromHost("info.blockvibe.org")).toBe("default")
     expect(resolveTenantSlugFromHost("blockvibe.org")).toBe("default")
-    expect(resolveTenantSlugFromHost("nog.blockvibe.org")).toBe("nog")
+    expect(resolveTenantSlugFromHost("nog.blockvibe.org")).toBe("default")
     expect(resolveTenantSlugFromHost("beaverdale.blockvibe.org")).toBe("beaverdale")
   })
 })

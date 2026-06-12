@@ -13,9 +13,9 @@ function getTenantURL(baseURL: string, slug: string): string {
 test.describe("Frontend", () => {
   test("can load homepage", async ({ page }) => {
     await page.goto("/")
-    await expect(page).toHaveTitle(/North Of Grand/i)
+    await expect(page).toHaveTitle(/BlockVibe/i)
     const heading = page.locator("h1").first()
-    await expect(heading).toHaveText("North of Grand Neighborhood Association")
+    await expect(heading).toHaveText("One platform for your neighborhood")
   })
 
   test("can load NOG tenant homepage", async ({ browser, baseURL }) => {

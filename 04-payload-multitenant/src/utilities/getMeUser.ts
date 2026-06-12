@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 import type { User } from "../payload-types"
@@ -15,7 +15,18 @@ export const getMeUser = async (args?: {
   const cookieStore = await cookies()
   const token = cookieStore.get("payload-token")?.value
 
-  const meUserReq = await fetch(`${getClientSideURL()}/api/users/me`, {
+  let serverUrl = "http://localhost:3000"
+  try {
+    const host = (await headers()).get("host")
+    if (host) {
+      const protocol = host.includes("localhost") || host.includes("127.0.0.1") ? "http:" : "https:"
+      serverUrl = `${protocol}//${host}`
+    }
+  } catch (e) {
+    serverUrl = "http://localhost:3000"
+  }
+
+  const meUserReq = await fetch(`${serverUrl}/api/users/me`, {
     headers: {
       Authorization: `JWT ${token}`,
     },
@@ -27,11 +38,15 @@ export const getMeUser = async (args?: {
     user: User
   } = await meUserReq.json()
 
+  console.log(`[getMeUser] Token exists: ${!!token}, Status: ${meUserReq.status}, User: ${user?.email || "none"}, URL: ${serverUrl}/api/users/me`)
+
   if (validUserRedirect && meUserReq.ok && user) {
+    console.log(`[getMeUser] Redirecting to validUserRedirect: ${validUserRedirect}`)
     redirect(validUserRedirect)
   }
 
   if (nullUserRedirect && (!meUserReq.ok || !user)) {
+    console.log(`[getMeUser] Redirecting to nullUserRedirect: ${nullUserRedirect} (ok: ${meUserReq.ok}, user: ${!!user})`)
     redirect(nullUserRedirect)
   }
 

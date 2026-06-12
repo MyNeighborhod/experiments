@@ -7,7 +7,7 @@ import type { Theme } from "./Theme/types"
 
 export const Providers: React.FC<{
   children: React.ReactNode
-  theme?: Theme
+  theme?: Theme | "auto"
 }> = ({ children, theme }) => {
   return (
     <ThemeProvider theme={theme}>

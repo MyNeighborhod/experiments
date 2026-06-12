@@ -76,6 +76,7 @@ export interface Config {
     header: Header;
     footer: Footer;
     invites: Invite;
+    'tenant-requests': TenantRequest;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -102,6 +103,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     invites: InvitesSelect<false> | InvitesSelect<true>;
+    'tenant-requests': TenantRequestsSelect<false> | TenantRequestsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -920,6 +922,21 @@ export interface Invite {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenant-requests".
+ */
+export interface TenantRequest {
+  id: number;
+  tenantName: string;
+  email: string;
+  phone: string;
+  address: string;
+  website?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1144,6 +1161,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invites';
         value: number | Invite;
+      } | null)
+    | ({
+        relationTo: 'tenant-requests';
+        value: number | TenantRequest;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1595,6 +1616,20 @@ export interface InvitesSelect<T extends boolean = true> {
   email?: T;
   name?: T;
   token?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenant-requests_select".
+ */
+export interface TenantRequestsSelect<T extends boolean = true> {
+  tenantName?: T;
+  email?: T;
+  phone?: T;
+  address?: T;
+  website?: T;
   status?: T;
   updatedAt?: T;
   createdAt?: T;

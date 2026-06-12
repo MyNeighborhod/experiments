@@ -20,7 +20,7 @@ export const ThemeProvider = ({
   theme: defaultThemeProp,
 }: {
   children: React.ReactNode
-  theme?: Theme
+  theme?: Theme | "auto"
 }) => {
   const [theme, setThemeState] = useState<Theme | undefined>(
     canUseDOM ? (document.documentElement.getAttribute("data-theme") as Theme) : undefined,
