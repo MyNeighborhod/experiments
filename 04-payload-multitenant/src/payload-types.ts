@@ -204,7 +204,16 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | IframeBlock
+    | SlideshowBlock
+    | FileListBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -838,6 +847,46 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IframeBlock".
+ */
+export interface IframeBlock {
+  iframeUrl: string;
+  height: number;
+  title?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'iframeBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SlideshowBlock".
+ */
+export interface SlideshowBlock {
+  images: {
+    image: number | Media;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'slideshowBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FileListBlock".
+ */
+export interface FileListBlock {
+  title?: string | null;
+  files: {
+    file: number | Media;
+    description?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'fileListBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
@@ -1244,6 +1293,9 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        iframeBlock?: T | IframeBlockSelect<T>;
+        slideshowBlock?: T | SlideshowBlockSelect<T>;
+        fileListBlock?: T | FileListBlockSelect<T>;
       };
   meta?:
     | T
@@ -1342,6 +1394,47 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "IframeBlock_select".
+ */
+export interface IframeBlockSelect<T extends boolean = true> {
+  iframeUrl?: T;
+  height?: T;
+  title?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "SlideshowBlock_select".
+ */
+export interface SlideshowBlockSelect<T extends boolean = true> {
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FileListBlock_select".
+ */
+export interface FileListBlockSelect<T extends boolean = true> {
+  title?: T;
+  files?:
+    | T
+    | {
+        file?: T;
+        description?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

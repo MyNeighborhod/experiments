@@ -441,108 +441,40 @@ async function run() {
     })
   }
 
-  // 5. Create media items in Payload
-  payload.logger.info("Uploading media items...")
-  const mediaDocs = await Promise.all([
-    payload.create({
+  // 5. Create media items in Payload sequentially to prevent connection exhaustion and deadlocks
+  payload.logger.info("Uploading media items sequentially...")
+  const mediaItemsToCreate = [
+    { alt: "North of Grand Blue Badge Logo", file: logoHeaderFile },
+    { alt: "North of Grand Green Wordmark Logo", file: logoFooterFile },
+    { alt: "North of Grand Historic House", file: homePhotoFile },
+    { alt: "North of Grand 2026 Board Members", file: boardPhotoFile },
+    { alt: "North of Grand Merch T-Shirt", file: merch1File },
+    { alt: "North of Grand Badge White Logo", file: merch2File },
+    { alt: "North of Grand Merch Mug", file: merch3File },
+    { alt: "North of Grand Slide 1", file: slide1File },
+    { alt: "North of Grand Slide 2", file: slide2File },
+    { alt: "North of Grand Slide 3", file: slide3File },
+    { alt: "North of Grand Slide 4", file: slide4File },
+    { alt: "North of Grand Slide 5", file: slide5File },
+    { alt: "North of Grand Slide 6", file: slide6File },
+    { alt: "North of Grand Slide 7", file: slide7File },
+    { alt: "May 2026 General Meeting Minutes", file: minutesMayFile },
+    { alt: "March 2026 Board Meeting Minutes", file: minutesMarFile },
+    { alt: "February 2026 Board Meeting Minutes", file: minutesFebFile },
+    { alt: "January 2026 Board Meeting Minutes", file: minutesJanFile },
+    { alt: "North of Grand Bylaws (Updated 2026)", file: bylawsFile },
+  ]
+
+  const mediaDocs: any[] = []
+  for (const item of mediaItemsToCreate) {
+    payload.logger.info(`Uploading media: ${item.alt}...`)
+    const doc = await payload.create({
       collection: "media",
-      data: { alt: "North of Grand Blue Badge Logo", tenant: tenant.id },
-      file: logoHeaderFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Green Wordmark Logo", tenant: tenant.id },
-      file: logoFooterFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Historic House", tenant: tenant.id },
-      file: homePhotoFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand 2026 Board Members", tenant: tenant.id },
-      file: boardPhotoFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Merch T-Shirt", tenant: tenant.id },
-      file: merch1File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Badge White Logo", tenant: tenant.id },
-      file: merch2File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Merch Mug", tenant: tenant.id },
-      file: merch3File,
-    }),
-    // Slideshow
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 1", tenant: tenant.id },
-      file: slide1File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 2", tenant: tenant.id },
-      file: slide2File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 3", tenant: tenant.id },
-      file: slide3File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 4", tenant: tenant.id },
-      file: slide4File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 5", tenant: tenant.id },
-      file: slide5File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 6", tenant: tenant.id },
-      file: slide6File,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Slide 7", tenant: tenant.id },
-      file: slide7File,
-    }),
-    // Minutes
-    payload.create({
-      collection: "media",
-      data: { alt: "May 2026 General Meeting Minutes", tenant: tenant.id },
-      file: minutesMayFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "March 2026 Board Meeting Minutes", tenant: tenant.id },
-      file: minutesMarFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "February 2026 Board Meeting Minutes", tenant: tenant.id },
-      file: minutesFebFile,
-    }),
-    payload.create({
-      collection: "media",
-      data: { alt: "January 2026 Board Meeting Minutes", tenant: tenant.id },
-      file: minutesJanFile,
-    }),
-    // Bylaws
-    payload.create({
-      collection: "media",
-      data: { alt: "North of Grand Bylaws (Updated 2026)", tenant: tenant.id },
-      file: bylawsFile,
-    }),
-  ])
+      data: { alt: item.alt, tenant: tenant.id },
+      file: item.file,
+    })
+    mediaDocs.push(doc)
+  }
 
   const [
     logoHeaderDoc,
@@ -586,9 +518,7 @@ async function run() {
       title: "NOG Newsletter Signup Form",
       submitButtonLabel: "Subscribe to Newsletter",
       confirmationType: "message",
-      confirmationMessage: lexicalRichText([
-        richHeading("Thank you for subscribing!", "h3"),
-      ]),
+      confirmationMessage: lexicalRichText([richHeading("Thank you for subscribing!", "h3")]),
       fields: [
         {
           name: "email",
@@ -811,7 +741,8 @@ async function run() {
         {
           blockName: "Google Calendar Block",
           blockType: "iframeBlock",
-          iframeUrl: "https://calendar.google.com/calendar/embed?src=northofgrandpresident%40gmail.com&ctz=America%2FChicago",
+          iframeUrl:
+            "https://calendar.google.com/calendar/embed?src=northofgrandpresident%40gmail.com&ctz=America%2FChicago",
           height: 600,
           title: "North Of Grand Google Calendar",
         },
@@ -820,7 +751,9 @@ async function run() {
           blockType: "cta",
           richText: lexicalRichText([
             richHeading("Prefer Social Updates?"),
-            richParagraph("Check out our Facebook page for detailed descriptions of meetings and local events."),
+            richParagraph(
+              "Check out our Facebook page for detailed descriptions of meetings and local events.",
+            ),
           ]),
           links: [
             {
@@ -937,9 +870,7 @@ async function run() {
           blockName: "Bylaws File",
           blockType: "fileListBlock",
           title: "Association Bylaws (updated 2026)",
-          files: [
-            { file: bylawsDoc.id, description: "Proposed and updated amendments for 2026." },
-          ],
+          files: [{ file: bylawsDoc.id, description: "Proposed and updated amendments for 2026." }],
         },
       ],
       meta: {
@@ -991,9 +922,7 @@ async function run() {
           blockName: "General Question Form",
           blockType: "formBlock",
           enableIntro: true,
-          introContent: lexicalRichText([
-            richHeading("Have a question?", "h3"),
-          ]),
+          introContent: lexicalRichText([richHeading("Have a question?", "h3")]),
           form: contactForm.id,
         },
         {
