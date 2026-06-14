@@ -75,11 +75,27 @@ async function fetchFile(url: string) {
     }
     const data = await res.arrayBuffer()
     const filename = url.split("/").pop()?.split("?")[0] || `file-${Date.now()}`
-    const ext = filename.split(".").pop() || "png"
+    const ext = filename.split(".").pop()?.toLowerCase() || ""
+
+    let mimetype = "image/png"
+    if (ext === "pdf") {
+      mimetype = "application/pdf"
+    } else if (ext === "docx") {
+      mimetype = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    } else if (ext === "doc") {
+      mimetype = "application/msword"
+    } else if (ext === "jpeg" || ext === "jpg") {
+      mimetype = "image/jpeg"
+    } else if (ext === "webp") {
+      mimetype = "image/webp"
+    } else if (ext === "png") {
+      mimetype = "image/png"
+    }
+
     return {
       name: filename,
       data: Buffer.from(data),
-      mimetype: `image/${ext === "jpeg" || ext === "jpg" ? "jpeg" : ext === "webp" ? "webp" : "png"}`,
+      mimetype,
       size: data.byteLength,
     }
   } catch (error) {
@@ -220,6 +236,18 @@ async function run() {
     merch1File,
     merch2File,
     merch3File,
+    slide1File,
+    slide2File,
+    slide3File,
+    slide4File,
+    slide5File,
+    slide6File,
+    slide7File,
+    minutesMayFile,
+    minutesMarFile,
+    minutesFebFile,
+    minutesJanFile,
+    bylawsFile,
   ] = await Promise.all([
     fetchFile(
       "https://www.northofgranddsm.org/uploads/1/4/1/5/141517828/published/northofgrand-badge-color-blue.png?1723053124",
@@ -236,6 +264,31 @@ async function run() {
       "https://www.northofgranddsm.org/uploads/1/4/1/5/141517828/northofgrand-badge-color-white-1-1_orig.png",
     ),
     fetchFile("https://www.northofgranddsm.org/uploads/1/4/1/5/141517828/img-7444_orig.jpg"),
+    // Slides
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-architech.jpg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-art-walk.jpg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-breakdancing.jpg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-bridge.jpg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-couple.jpeg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-music-art-walk.jpg"),
+    fetchFile("https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog-night-out.jpg"),
+    // Minutes
+    fetchFile(
+      "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/05_may_2026_nog_general_meeting_minutes.docx",
+    ),
+    fetchFile(
+      "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    ),
+    fetchFile(
+      "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/02_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    ),
+    fetchFile(
+      "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/01_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+    ),
+    // Bylaws
+    fetchFile(
+      "https://www.northofgranddsm.org/uploads/1/5/5/3/155377114/nog_bylaws_-_proposed_march_2026.pdf",
+    ),
   ])
 
   // 3. Create Tenant
@@ -390,15 +443,7 @@ async function run() {
 
   // 5. Create media items in Payload
   payload.logger.info("Uploading media items...")
-  const [
-    logoHeaderDoc,
-    logoFooterDoc,
-    homePhotoDoc,
-    boardPhotoDoc,
-    merch1Doc,
-    merch2Doc,
-    merch3Doc,
-  ] = await Promise.all([
+  const mediaDocs = await Promise.all([
     payload.create({
       collection: "media",
       data: { alt: "North of Grand Blue Badge Logo", tenant: tenant.id },
@@ -434,7 +479,176 @@ async function run() {
       data: { alt: "North of Grand Merch Mug", tenant: tenant.id },
       file: merch3File,
     }),
+    // Slideshow
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 1", tenant: tenant.id },
+      file: slide1File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 2", tenant: tenant.id },
+      file: slide2File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 3", tenant: tenant.id },
+      file: slide3File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 4", tenant: tenant.id },
+      file: slide4File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 5", tenant: tenant.id },
+      file: slide5File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 6", tenant: tenant.id },
+      file: slide6File,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Slide 7", tenant: tenant.id },
+      file: slide7File,
+    }),
+    // Minutes
+    payload.create({
+      collection: "media",
+      data: { alt: "May 2026 General Meeting Minutes", tenant: tenant.id },
+      file: minutesMayFile,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "March 2026 Board Meeting Minutes", tenant: tenant.id },
+      file: minutesMarFile,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "February 2026 Board Meeting Minutes", tenant: tenant.id },
+      file: minutesFebFile,
+    }),
+    payload.create({
+      collection: "media",
+      data: { alt: "January 2026 Board Meeting Minutes", tenant: tenant.id },
+      file: minutesJanFile,
+    }),
+    // Bylaws
+    payload.create({
+      collection: "media",
+      data: { alt: "North of Grand Bylaws (Updated 2026)", tenant: tenant.id },
+      file: bylawsFile,
+    }),
   ])
+
+  const [
+    logoHeaderDoc,
+    logoFooterDoc,
+    homePhotoDoc,
+    boardPhotoDoc,
+    merch1Doc,
+    merch2Doc,
+    merch3Doc,
+    slide1Doc,
+    slide2Doc,
+    slide3Doc,
+    slide4Doc,
+    slide5Doc,
+    slide6Doc,
+    slide7Doc,
+    minutesMayDoc,
+    minutesMarDoc,
+    minutesFebDoc,
+    minutesJanDoc,
+    bylawsDoc,
+  ] = mediaDocs
+
+  // Delete existing forms to prevent duplicate/stale entries
+  payload.logger.info("Deleting existing NOG Forms...")
+  await payload.delete({
+    collection: "forms",
+    where: {
+      or: [
+        { title: { equals: "NOG Newsletter Signup Form" } },
+        { title: { equals: "NOG General Contact Form" } },
+      ],
+    },
+  })
+
+  // Create NOG forms
+  payload.logger.info("Creating NOG Newsletter Signup Form...")
+  const newsletterForm = await payload.create({
+    collection: "forms",
+    data: {
+      title: "NOG Newsletter Signup Form",
+      submitButtonLabel: "Subscribe to Newsletter",
+      confirmationType: "message",
+      confirmationMessage: lexicalRichText([
+        richHeading("Thank you for subscribing!", "h3"),
+      ]),
+      fields: [
+        {
+          name: "email",
+          blockName: "email",
+          blockType: "email",
+          label: "Email Address",
+          required: true,
+          width: 100,
+        },
+      ],
+    },
+  })
+
+  payload.logger.info("Creating NOG General Contact Form...")
+  const contactForm = await payload.create({
+    collection: "forms",
+    data: {
+      title: "NOG General Contact Form",
+      submitButtonLabel: "Submit Message",
+      confirmationType: "message",
+      confirmationMessage: lexicalRichText([
+        richHeading("Your message was sent!", "h3"),
+        richParagraph("We'll get back to you soon."),
+      ]),
+      fields: [
+        {
+          name: "firstName",
+          blockName: "firstName",
+          blockType: "text",
+          label: "First Name",
+          required: true,
+          width: 50,
+        },
+        {
+          name: "lastName",
+          blockName: "lastName",
+          blockType: "text",
+          label: "Last Name",
+          required: false,
+          width: 50,
+        },
+        {
+          name: "email",
+          blockName: "email",
+          blockType: "email",
+          label: "Email Address",
+          required: true,
+          width: 100,
+        },
+        {
+          name: "comment",
+          blockName: "comment",
+          blockType: "textarea",
+          label: "Message / Comment",
+          required: true,
+          width: 100,
+        },
+      ],
+    },
+  })
 
   // 6. Create Pages
   payload.logger.info("Creating pages...")
@@ -527,6 +741,19 @@ async function run() {
       },
       layout: [
         {
+          blockName: "Slideshow",
+          blockType: "slideshowBlock",
+          images: [
+            { image: slide1Doc.id },
+            { image: slide2Doc.id },
+            { image: slide3Doc.id },
+            { image: slide4Doc.id },
+            { image: slide5Doc.id },
+            { image: slide6Doc.id },
+            { image: slide7Doc.id },
+          ],
+        },
+        {
           blockName: "About Info Content",
           blockType: "content",
           columns: [
@@ -534,7 +761,6 @@ async function run() {
               type: "text",
               size: "full",
               richText: lexicalRichText([
-                richParagraph("[SLIDESHOW_PLACEHOLDER]"),
                 richHeading("About North of Grand"),
                 richParagraph(
                   "Nestled within the vibrant cityscape of Des Moines, Iowa, the North of Grand neighborhood offers a harmonious blend of urban convenience and historic charm. Characterized by tree-lined streets and an eclectic mix of architectural styles, our cozy neighborhood boasts a distinct personality that captivates residents and visitors alike. From quaint boutique shops and unique bars & eateries, to lively community events like Ingersoll Live, North of Grand provides a dynamic living experience. Its proximity to downtown Des Moines ensures easy access to cultural attractions, dining options, and employment opportunities, while maintaining a serene residential atmosphere.",
@@ -584,16 +810,26 @@ async function run() {
       layout: [
         {
           blockName: "Google Calendar Block",
-          blockType: "content",
-          columns: [
+          blockType: "iframeBlock",
+          iframeUrl: "https://calendar.google.com/calendar/embed?src=northofgrandpresident%40gmail.com&ctz=America%2FChicago",
+          height: 600,
+          title: "North Of Grand Google Calendar",
+        },
+        {
+          blockName: "Social Media CTA",
+          blockType: "cta",
+          richText: lexicalRichText([
+            richHeading("Prefer Social Updates?"),
+            richParagraph("Check out our Facebook page for detailed descriptions of meetings and local events."),
+          ]),
+          links: [
             {
-              type: "text",
-              size: "full",
-              richText: lexicalRichText([
-                richHeading("Calendar"),
-                richParagraph("[CALENDAR_PLACEHOLDER]"),
-                richParagraph("Check out Facebook for detailed descriptions of events."),
-              ]),
+              link: {
+                type: "custom",
+                label: "View Facebook Page",
+                url: "https://www.facebook.com/North.of.Grand.DSM/?viewas=100000686899395",
+                appearance: "default",
+              },
             },
           ],
         },
@@ -678,19 +914,31 @@ async function run() {
       },
       layout: [
         {
-          blockName: "Meeting Minutes & Bylaws Block",
-          blockType: "content",
-          columns: [
+          blockName: "Minutes List",
+          blockType: "fileListBlock",
+          title: "Past Board Meeting Minutes",
+          files: [
+            { file: minutesMayDoc.id, description: "05_may_2026_nog_general_meeting_minutes.docx" },
             {
-              type: "text",
-              size: "full",
-              richText: lexicalRichText([
-                richHeading("Past Board Meeting Minutes"),
-                richParagraph("[DOCUMENTS_PLACEHOLDER]"),
-                richHeading("NoG Bylaws (updated 2026)"),
-                richParagraph("[BYLAWS_PLACEHOLDER]"),
-              ]),
+              file: minutesMarDoc.id,
+              description: "03_mar_2026_nog_board_of_directors_meeting_minutes__1_.docx",
             },
+            {
+              file: minutesFebDoc.id,
+              description: "02_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+            },
+            {
+              file: minutesJanDoc.id,
+              description: "01_2026_nog_board_of_directors_meeting_minutes__1_.docx",
+            },
+          ],
+        },
+        {
+          blockName: "Bylaws File",
+          blockType: "fileListBlock",
+          title: "Association Bylaws (updated 2026)",
+          files: [
+            { file: bylawsDoc.id, description: "Proposed and updated amendments for 2026." },
           ],
         },
       ],
@@ -716,7 +964,7 @@ async function run() {
       },
       layout: [
         {
-          blockName: "Contact Section Block",
+          blockName: "Contact Header Block",
           blockType: "content",
           columns: [
             {
@@ -725,8 +973,68 @@ async function run() {
               richText: lexicalRichText([
                 richHeading("Contact Us"),
                 richParagraph("We look forward to hearing from you!"),
-                richParagraph("[CONTACT_PLACEHOLDER]"),
               ]),
+            },
+          ],
+        },
+        {
+          blockName: "Mailing List signup Form",
+          blockType: "formBlock",
+          enableIntro: true,
+          introContent: lexicalRichText([
+            richHeading("Join our mailing list!", "h3"),
+            richParagraph("*we do not sell or share your info"),
+          ]),
+          form: newsletterForm.id,
+        },
+        {
+          blockName: "General Question Form",
+          blockType: "formBlock",
+          enableIntro: true,
+          introContent: lexicalRichText([
+            richHeading("Have a question?", "h3"),
+          ]),
+          form: contactForm.id,
+        },
+        {
+          blockName: "Map Embed",
+          blockType: "iframeBlock",
+          iframeUrl:
+            "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000.0!2d-93.66485899999999!3d41.5903345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87ee99b7b7a1dfa1%3A0xe10839e55ad0ba78!2sNorth%20of%20Grand%2C%20Des%20Moines%2C%20IA!5e0!3m2!1sen!2sus!4v1717650000000!5m2!1sen!2sus",
+          height: 350,
+          title: "North Of Grand Des Moines Area Map",
+        },
+        {
+          blockName: "Social Links",
+          blockType: "content",
+          columns: [
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richParagraph("Connect with us on Facebook for news and community discussion."),
+              ]),
+              enableLink: true,
+              link: {
+                type: "custom",
+                label: "Facebook Page",
+                url: "https://www.facebook.com/North.of.Grand.DSM/",
+                appearance: "default",
+              },
+            },
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richParagraph("Send an email directly to the association president."),
+              ]),
+              enableLink: true,
+              link: {
+                type: "custom",
+                label: "Email President",
+                url: "mailto:northofgrandpresident@gmail.com",
+                appearance: "default",
+              },
             },
           ],
         },
