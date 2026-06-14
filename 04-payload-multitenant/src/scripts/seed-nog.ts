@@ -126,10 +126,7 @@ async function run() {
   const existingTenants = await payload.find({
     collection: "tenants",
     where: {
-      or: [
-        { slug: { equals: "nog" } },
-        { domain: { equals: "www.northofgranddsm.org" } },
-      ],
+      or: [{ slug: { equals: "nog" } }, { domain: { equals: "www.northofgranddsm.org" } }],
     },
     limit: 100,
   })
@@ -259,9 +256,10 @@ async function run() {
     where: { slug: { equals: "default" } },
     limit: 1,
   })
+  let defaultTenantDoc: any
   if (defaultTenants.docs.length === 0) {
     payload.logger.info("Creating Default Platform Tenant...")
-    await payload.create({
+    defaultTenantDoc = await payload.create({
       collection: "tenants",
       data: {
         name: "BlockVibe Platform",
@@ -269,7 +267,35 @@ async function run() {
         template: "light",
       },
     })
+  } else {
+    defaultTenantDoc = defaultTenants.docs[0]
   }
+
+  // Clean up default tenant's pages, headers, footers, and Space Request Form to prevent duplicates
+  if (defaultTenantDoc) {
+    payload.logger.info("Cleaning up existing default tenant pages/headers/footers...")
+    await payload.delete({
+      collection: "pages",
+      where: { tenant: { equals: defaultTenantDoc.id } },
+      context: { disableRevalidate: true },
+    })
+    await payload.delete({
+      collection: "header",
+      where: { tenant: { equals: defaultTenantDoc.id } },
+      context: { disableRevalidate: true },
+    })
+    await payload.delete({
+      collection: "footer",
+      where: { tenant: { equals: defaultTenantDoc.id } },
+      context: { disableRevalidate: true },
+    })
+  }
+
+  payload.logger.info("Deleting existing Space Request Forms...")
+  await payload.delete({
+    collection: "forms",
+    where: { title: { equals: "Space Request Form" } },
+  })
 
   // 4. Create tenant-specific admin user, neighbor user & link superadmin
   const nogAdminPassword = process.env.TENANT_NOG_PASSWORD || "password1234"
@@ -711,10 +737,207 @@ async function run() {
       },
     },
   })
+  // Create space request form using Payload Form Builder
+  payload.logger.info("Creating Space Request Form...")
+  const spaceRequestForm = await payload.create({
+    collection: "forms",
+    data: {
+      title: "Space Request Form",
+      submitButtonLabel: "Submit Space Request",
+      confirmationType: "message",
+      confirmationMessage: lexicalRichText([
+        richHeading("Request Submitted!", "h2"),
+        richParagraph("Thank you! Your neighborhood request has been submitted successfully."),
+      ]),
+      fields: [
+        {
+          name: "tenantName",
+          blockName: "tenantName",
+          blockType: "text",
+          label: "Neighborhood / Tenant Name",
+          required: true,
+          width: 100,
+        },
+        {
+          name: "email",
+          blockName: "email",
+          blockType: "email",
+          label: "Contact Email",
+          required: true,
+          width: 50,
+        },
+        {
+          name: "phone",
+          blockName: "phone",
+          blockType: "text",
+          label: "Phone Number",
+          required: true,
+          width: 50,
+        },
+        {
+          name: "address",
+          blockName: "address",
+          blockType: "text",
+          label: "Full Mailing Address",
+          required: true,
+          width: 100,
+        },
+        {
+          name: "website",
+          blockName: "website",
+          blockType: "text",
+          label: "Existing Website (Optional)",
+          required: false,
+          width: 100,
+        },
+      ],
+    },
+  })
+
+  // Seeding Default Platform Tenant Home Page
+  payload.logger.info("Creating default platform homepage...")
+  const defaultHomeDoc = await payload.create({
+    collection: "pages",
+    depth: 0,
+    context: { disableRevalidate: true },
+    data: {
+      _status: "published",
+      title: "BlockVibe Platform - Home",
+      slug: "home",
+      tenant: defaultTenantDoc.id,
+      hero: {
+        type: "none",
+      },
+      layout: [
+        {
+          blockName: "BlockVibe Hero Section",
+          blockType: "content",
+          columns: [
+            {
+              type: "text",
+              size: "full",
+              richText: lexicalRichText([
+                richHeading("One platform for your neighborhood", "h1"),
+                richParagraph(
+                  "BlockVibe provides neighborhood associations with the digital tools they need to connect residents, build community trust, run democratic polls, and secure support.",
+                ),
+              ]),
+            },
+          ],
+        },
+        {
+          blockName: "See BlockVibe in Action Box",
+          blockType: "cta",
+          richText: lexicalRichText([
+            richHeading("See BlockVibe in Action"),
+            richParagraph(
+              "Explore our showcase site modeled for the North of Grand neighborhood in Des Moines, Iowa.",
+            ),
+          ]),
+          links: [
+            {
+              link: {
+                type: "custom",
+                label: "Visit Example Site",
+                url: "http://nog.localhost:3000",
+                appearance: "default",
+              },
+            },
+          ],
+        },
+        {
+          blockName: "BlockVibe Capabilities Grid Part 1",
+          blockType: "content",
+          columns: [
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richHeading("Modern Site Builder", "h3"),
+                richParagraph(
+                  "Launch a clean public website for your association with custom themes, static pages, contact forms, and layouts.",
+                ),
+              ]),
+            },
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richHeading("Resident CRM & Directory", "h3"),
+                richParagraph(
+                  "Maintain a secure registry of neighbors, track registered members vs mailing contacts, and manage roles in one workspace.",
+                ),
+              ]),
+            },
+          ],
+        },
+        {
+          blockName: "BlockVibe Capabilities Grid Part 2",
+          blockType: "content",
+          columns: [
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richHeading("Email Broadcaster", "h3"),
+                richParagraph(
+                  "Compose and send announcements directly to your verified neighborhood contact list using AWS SES.",
+                ),
+              ]),
+            },
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richHeading("Democratic Voting", "h3"),
+                richParagraph(
+                  "Run secure board elections, budget approvals, and community opinion polls with one ballot per member rules.",
+                ),
+              ]),
+            },
+          ],
+        },
+        {
+          blockName: "BlockVibe Capabilities Grid Part 3",
+          blockType: "content",
+          columns: [
+            {
+              type: "text",
+              size: "full",
+              richText: lexicalRichText([
+                richHeading("Lightweight Support Drives", "h3"),
+                richParagraph(
+                  "Accept annual or monthly contributions directly into your association's own PayPal account without platform fees.",
+                ),
+              ]),
+            },
+          ],
+        },
+        {
+          blockName: "BlockVibe Tenant Request Form",
+          blockType: "formBlock",
+          enableIntro: true,
+          introContent: lexicalRichText([
+            richHeading("Request a BlockVibe Space", "h2"),
+            richParagraph(
+              "Ready to bring BlockVibe to your neighborhood? Submit your info below and our team will reach out to set up your subdomain.",
+            ),
+          ]),
+          form: spaceRequestForm.id,
+        },
+      ],
+      meta: {
+        title: "BlockVibe - Operating System for Neighborhood Associations",
+        description:
+          "One platform for your neighborhood: website, member directory, email, polls, and recurring support.",
+      },
+    },
+  })
 
   // 7. Create Header and Footer globals (linked to the newly created pages and logos)
   payload.logger.info("Seeding Header and Footer...")
   await Promise.all([
+    // NOG Header
     payload.create({
       collection: "header",
       context: { disableRevalidate: true },
@@ -767,6 +990,7 @@ async function run() {
         ],
       },
     }),
+    // NOG Footer
     payload.create({
       collection: "footer",
       context: { disableRevalidate: true },
@@ -792,9 +1016,43 @@ async function run() {
         ],
       },
     }),
+    // Default Platform Header
+    payload.create({
+      collection: "header",
+      context: { disableRevalidate: true },
+      data: {
+        tenant: defaultTenantDoc.id,
+        navItems: [
+          {
+            link: {
+              type: "custom",
+              label: "Give it a try",
+              url: "#try",
+            },
+          },
+        ],
+      },
+    }),
+    // Default Platform Footer
+    payload.create({
+      collection: "footer",
+      context: { disableRevalidate: true },
+      data: {
+        tenant: defaultTenantDoc.id,
+        navItems: [
+          {
+            link: {
+              type: "custom",
+              label: "Admin Portal",
+              url: "/admin",
+            },
+          },
+        ],
+      },
+    }),
   ])
 
-  payload.logger.info("NOG Tenant Seeded Successfully with custom pages and live assets!")
+  payload.logger.info("Tenant and Platform Seeded Successfully with custom pages and live assets!")
   process.exit(0)
 }
 

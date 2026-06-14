@@ -18,7 +18,6 @@ test.describe("BlockVibe Platform Landing Page E2E Tests", () => {
     await expect(page.locator("label:has-text('Contact Email')")).toBeVisible()
     await expect(page.locator("label:has-text('Phone Number')")).toBeVisible()
     await expect(page.locator("label:has-text('Full Mailing Address')")).toBeVisible()
-    await expect(page.locator("label:has-text('Security Verification')")).toBeVisible()
   })
 
   test("2. Displays correct NOG example link dynamically", async ({ page }) => {
@@ -31,25 +30,23 @@ test.describe("BlockVibe Platform Landing Page E2E Tests", () => {
     expect(href).toContain("nog.localhost")
   })
 
-  test("3. Captcha challenge generates and security answer rejects wrong inputs", async ({ page }) => {
+  test("3. Submits the Space Request Form successfully", async ({ page }) => {
     await page.goto("/")
 
-    // Wait for the captcha text to load
-    const solveText = page.locator("text=Solve:")
-    await expect(solveText).toBeVisible()
-
-    // Fill the form fields
+    // Fill the form fields using the ids/names
     await page.fill("input[name='tenantName']", "Test E2E Neighborhood")
     await page.fill("input[name='email']", "e2etest@example.com")
     await page.fill("input[name='phone']", "555-123-4567")
     await page.fill("input[name='address']", "123 Main St, Anytown, IA")
-    await page.fill("input[name='captchaAnswer']", "999") // deliberately wrong answer
 
-    // Submit
-    await page.click("button[type='submit']")
+    // Submit using the seeded submit button label
+    await page.click("button:has-text('Submit Space Request')")
 
-    // Expect error message
-    await expect(page.locator("text=Incorrect or expired captcha answer")).toBeVisible()
+    // Expect success message
+    await expect(page.locator("text=Request Submitted!")).toBeVisible()
+    await expect(
+      page.locator("text=Thank you! Your neighborhood request has been submitted successfully."),
+    ).toBeVisible()
   })
 
   test("4. Standard NOG website homepage loads on nog subdomain", async ({ browser, baseURL }) => {

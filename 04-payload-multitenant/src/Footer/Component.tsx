@@ -51,6 +51,27 @@ export async function Footer() {
     )
   }
 
+  if (tenant?.slug === "default") {
+    return (
+      <footer className="mt-auto border-t border-gray-100 bg-white py-8">
+        <div className="container max-w-4xl mx-auto px-4 flex flex-col md:flex-row md:justify-between items-center text-xs text-gray-400 gap-4">
+          <p>© {new Date().getFullYear()} BlockVibe. All rights reserved.</p>
+          <nav className="flex gap-4">
+            {navItems.map(({ link }, i) => {
+              return (
+                <CMSLink
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  key={i}
+                  {...link}
+                />
+              )
+            })}
+          </nav>
+        </div>
+      </footer>
+    )
+  }
+
   return (
     <footer className="mt-auto border-t border-border bg-black dark:bg-card text-white">
       <div className="container py-8 gap-8 flex flex-col md:flex-row md:justify-between items-center">

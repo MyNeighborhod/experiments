@@ -38,7 +38,9 @@ export const getMeUser = async (args?: {
     user: User
   } = await meUserReq.json()
 
-  console.log(`[getMeUser] Token exists: ${!!token}, Status: ${meUserReq.status}, User: ${user?.email || "none"}, URL: ${serverUrl}/api/users/me`)
+  console.log(
+    `[getMeUser] Token exists: ${!!token}, Status: ${meUserReq.status}, User: ${user?.email || "none"}, URL: ${serverUrl}/api/users/me`,
+  )
 
   if (validUserRedirect && meUserReq.ok && user) {
     console.log(`[getMeUser] Redirecting to validUserRedirect: ${validUserRedirect}`)
@@ -46,7 +48,9 @@ export const getMeUser = async (args?: {
   }
 
   if (nullUserRedirect && (!meUserReq.ok || !user)) {
-    console.log(`[getMeUser] Redirecting to nullUserRedirect: ${nullUserRedirect} (ok: ${meUserReq.ok}, user: ${!!user})`)
+    console.log(
+      `[getMeUser] Redirecting to nullUserRedirect: ${nullUserRedirect} (ok: ${meUserReq.ok}, user: ${!!user})`,
+    )
     redirect(nullUserRedirect)
   }
 
