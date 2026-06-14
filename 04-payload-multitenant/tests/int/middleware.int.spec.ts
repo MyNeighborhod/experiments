@@ -74,11 +74,11 @@ describe("Middleware Multi-Tenant Routing", () => {
       expect(res?.url.pathname).toBe("/default/about")
     })
 
-    it("rewrites localhost subdomains to subdomain slug (e.g. nog.localhost -> default)", () => {
+    it("rewrites localhost subdomains to subdomain slug (e.g. nog.localhost -> nog)", () => {
       const req = createMockRequest("http://nog.localhost:3000/posts", "nog.localhost:3000")
       const res = middleware(req) as any
       expect(res?.type).toBe("rewrite")
-      expect(res?.url.pathname).toBe("/default/posts")
+      expect(res?.url.pathname).toBe("/nog/posts")
     })
 
     it("rewrites platform main site (info.blockvibe.org) to /default", () => {
@@ -95,11 +95,11 @@ describe("Middleware Multi-Tenant Routing", () => {
       expect(res?.url.pathname).toBe("/default/about")
     })
 
-    it("rewrites platform subdomains to subdomain slug (e.g. nog.blockvibe.org -> default)", () => {
+    it("rewrites platform subdomains to subdomain slug (e.g. nog.blockvibe.org -> nog)", () => {
       const req = createMockRequest("https://nog.blockvibe.org/contact", "nog.blockvibe.org")
       const res = middleware(req) as any
       expect(res?.type).toBe("rewrite")
-      expect(res?.url.pathname).toBe("/default/contact")
+      expect(res?.url.pathname).toBe("/nog/contact")
     })
 
     it("rewrites custom domains to full hostname (e.g. www.northofgranddsm.org)", () => {

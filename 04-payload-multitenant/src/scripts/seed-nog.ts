@@ -126,7 +126,10 @@ async function run() {
   const existingTenants = await payload.find({
     collection: "tenants",
     where: {
-      or: [{ slug: { equals: "default" } }, { slug: { equals: "nog" } }],
+      or: [
+        { slug: { equals: "nog" } },
+        { domain: { equals: "www.northofgranddsm.org" } },
+      ],
     },
     limit: 100,
   })
@@ -244,11 +247,29 @@ async function run() {
     collection: "tenants",
     data: {
       name: "North Of Grand Des Moines",
-      slug: "default",
+      slug: "nog",
       domain: "www.northofgranddsm.org",
       template: "light",
     },
   })
+
+  // Ensure Default Platform Tenant exists
+  const defaultTenants = await payload.find({
+    collection: "tenants",
+    where: { slug: { equals: "default" } },
+    limit: 1,
+  })
+  if (defaultTenants.docs.length === 0) {
+    payload.logger.info("Creating Default Platform Tenant...")
+    await payload.create({
+      collection: "tenants",
+      data: {
+        name: "BlockVibe Platform",
+        slug: "default",
+        template: "light",
+      },
+    })
+  }
 
   // 4. Create tenant-specific admin user, neighbor user & link superadmin
   const nogAdminPassword = process.env.TENANT_NOG_PASSWORD || "password1234"

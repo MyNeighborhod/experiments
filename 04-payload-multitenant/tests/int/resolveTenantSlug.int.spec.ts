@@ -12,15 +12,15 @@ describe("resolveTenantSlugFromHost", () => {
     expect(resolveTenantSlugFromHost("127.0.0.1")).toBe("default")
   })
 
-  it("maps localhost subdomains to their slug (nog.localhost -> default)", () => {
-    expect(resolveTenantSlugFromHost("nog.localhost")).toBe("default")
+  it("maps localhost subdomains to their slug (nog.localhost -> nog)", () => {
+    expect(resolveTenantSlugFromHost("nog.localhost")).toBe("nog")
     expect(resolveTenantSlugFromHost("beaverdale.localhost")).toBe("beaverdale")
   })
 
   it("maps production platform hosts", () => {
     expect(resolveTenantSlugFromHost("info.blockvibe.org")).toBe("default")
     expect(resolveTenantSlugFromHost("blockvibe.org")).toBe("default")
-    expect(resolveTenantSlugFromHost("nog.blockvibe.org")).toBe("default")
+    expect(resolveTenantSlugFromHost("nog.blockvibe.org")).toBe("nog")
     expect(resolveTenantSlugFromHost("beaverdale.blockvibe.org")).toBe("beaverdale")
   })
 })
@@ -38,9 +38,9 @@ describe("template chrome selection", () => {
     expect(shouldUseNogChrome(tenant)).toBe(true)
   })
 
-  it("uses NOG chrome for migrated default tenant", () => {
-    const tenant = { slug: "default", name: "North Of Grand Des Moines" }
-    expect(isNorthOfGrandTenant(tenant)).toBe(true)
-    expect(shouldUseNogChrome(tenant)).toBe(true)
+  it("does not use NOG chrome for platform default tenant", () => {
+    const tenant = { slug: "default", name: "BlockVibe Platform" }
+    expect(isNorthOfGrandTenant(tenant)).toBe(false)
+    expect(shouldUseNogChrome(tenant)).toBe(false)
   })
 })

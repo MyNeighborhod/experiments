@@ -1,20 +1,17 @@
 import React from "react"
 import { Header } from "@/Header/Component"
 import { Footer } from "@/Footer/Component"
-import { headers } from "next/headers"
 
-export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const headerList = await headers()
-  const host = headerList.get("host") || ""
-  const hostname = host.split(":")[0]
+export default async function PublicLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ tenant: string }>
+}) {
+  const { tenant } = await params
 
-  const isPlatformLanding =
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname === "blockvibe.org" ||
-    hostname === "info.blockvibe.org"
-
-  if (isPlatformLanding) {
+  if (tenant === "default") {
     return (
       <div className="min-h-screen bg-white text-gray-900 flex flex-col font-sans">
         <header className="border-b border-gray-100 bg-white">

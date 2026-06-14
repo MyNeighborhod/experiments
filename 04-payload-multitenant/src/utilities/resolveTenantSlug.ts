@@ -8,7 +8,7 @@ export function resolveTenantSlugFromHost(hostname: string): string {
 
   if (hostname.endsWith(".localhost")) {
     const slug = hostname.split(".")[0]
-    return slug === "nog" ? "default" : slug
+    return slug
   }
 
   if (hostname === `info.${PLATFORM_DOMAIN}` || hostname === PLATFORM_DOMAIN) {
@@ -17,7 +17,7 @@ export function resolveTenantSlugFromHost(hostname: string): string {
 
   if (hostname.endsWith(`.${PLATFORM_DOMAIN}`)) {
     const slug = hostname.replace(`.${PLATFORM_DOMAIN}`, "")
-    return slug === "nog" ? "default" : slug
+    return slug
   }
 
   return hostname
@@ -33,11 +33,7 @@ type TenantLike = { slug?: string | null; name?: string | null } | null | undefi
 /** True when the tenant record is North of Grand (not a generic Payload template default). */
 export function isNorthOfGrandTenant(tenant: TenantLike): boolean {
   if (!tenant?.slug) return false
-  if (tenant.slug === "nog") return true
-  if (tenant.slug === "default") {
-    return (tenant.name?.toLowerCase() ?? "").includes("north of grand")
-  }
-  return false
+  return tenant.slug === "nog"
 }
 
 /** Use NOG header/footer chrome and theme when the tenant is actually North of Grand. */
