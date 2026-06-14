@@ -150,6 +150,20 @@ async function run() {
   for (const tenant of existingTenants.docs) {
     payload.logger.info(`Cleaning up existing data for NOG Tenant ID: ${tenant.id}...`)
 
+    console.log("Deleting headers...")
+    await payload.delete({
+      collection: "header",
+      where: { tenant: { equals: tenant.id } },
+      context: { disableRevalidate: true },
+    })
+
+    console.log("Deleting footers...")
+    await payload.delete({
+      collection: "footer",
+      where: { tenant: { equals: tenant.id } },
+      context: { disableRevalidate: true },
+    })
+
     console.log("Deleting pages...")
     await payload.delete({
       collection: "pages",
@@ -168,20 +182,6 @@ async function run() {
     await payload.delete({
       collection: "media",
       where: { tenant: { equals: tenant.id } },
-    })
-
-    console.log("Deleting headers...")
-    await payload.delete({
-      collection: "header",
-      where: { tenant: { equals: tenant.id } },
-      context: { disableRevalidate: true },
-    })
-
-    console.log("Deleting footers...")
-    await payload.delete({
-      collection: "footer",
-      where: { tenant: { equals: tenant.id } },
-      context: { disableRevalidate: true },
     })
 
     console.log("Deleting invites...")
@@ -327,28 +327,54 @@ async function run() {
   // Clean up default tenant's pages, headers, footers, and Space Request Form to prevent duplicates
   if (defaultTenantDoc) {
     payload.logger.info("Cleaning up existing default tenant pages/headers/footers...")
-    await payload.delete({
-      collection: "pages",
-      where: { tenant: { equals: defaultTenantDoc.id } },
-      context: { disableRevalidate: true },
-    })
-    await payload.delete({
-      collection: "header",
-      where: { tenant: { equals: defaultTenantDoc.id } },
-      context: { disableRevalidate: true },
-    })
-    await payload.delete({
-      collection: "footer",
-      where: { tenant: { equals: defaultTenantDoc.id } },
-      context: { disableRevalidate: true },
-    })
+    try {
+      await payload.delete({
+        collection: "header",
+        where: { tenant: { equals: defaultTenantDoc.id } },
+        context: { disableRevalidate: true },
+      })
+      payload.logger.info("Deleted default tenant header.")
+    } catch (e: any) {
+      payload.logger.error("Failed to delete default tenant header: " + e.message)
+      if (e.cause) payload.logger.error("Cause: " + e.cause.message)
+    }
+
+    try {
+      await payload.delete({
+        collection: "footer",
+        where: { tenant: { equals: defaultTenantDoc.id } },
+        context: { disableRevalidate: true },
+      })
+      payload.logger.info("Deleted default tenant footer.")
+    } catch (e: any) {
+      payload.logger.error("Failed to delete default tenant footer: " + e.message)
+      if (e.cause) payload.logger.error("Cause: " + e.cause.message)
+    }
+
+    try {
+      await payload.delete({
+        collection: "pages",
+        where: { tenant: { equals: defaultTenantDoc.id } },
+        context: { disableRevalidate: true },
+      })
+      payload.logger.info("Deleted default tenant pages.")
+    } catch (e: any) {
+      payload.logger.error("Failed to delete default tenant pages: " + e.message)
+      if (e.cause) payload.logger.error("Cause: " + e.cause.message)
+    }
   }
 
   payload.logger.info("Deleting existing Space Request Forms...")
-  await payload.delete({
-    collection: "forms",
-    where: { title: { equals: "Space Request Form" } },
-  })
+  try {
+    await payload.delete({
+      collection: "forms",
+      where: { title: { equals: "Space Request Form" } },
+    })
+    payload.logger.info("Deleted existing Space Request Forms.")
+  } catch (e: any) {
+    payload.logger.error("Failed to delete space request form: " + e.message)
+    if (e.cause) payload.logger.error("Cause: " + e.cause.message)
+  }
 
   // 4. Create tenant-specific admin user, neighbor user & link superadmin
   const nogAdminPassword = process.env.TENANT_NOG_PASSWORD || "password1234"
@@ -1075,7 +1101,7 @@ async function run() {
             {
               link: {
                 type: "custom",
-                label: "Visit Example Site",
+                label: "Visit Site",
                 url: "http://nog.localhost:3000",
                 appearance: "default",
               },
@@ -1140,11 +1166,21 @@ async function run() {
           columns: [
             {
               type: "text",
-              size: "full",
+              size: "half",
               richText: lexicalRichText([
                 richHeading("Lightweight Support Drives", "h3"),
                 richParagraph(
                   "Accept annual or monthly contributions directly into your association's own PayPal account without platform fees.",
+                ),
+              ]),
+            },
+            {
+              type: "text",
+              size: "half",
+              richText: lexicalRichText([
+                richHeading("Secure & Privacy-First", "h3"),
+                richParagraph(
+                  "Your community data belongs to you. Built with strict role permissions, SSL encryption, and high data safety protocols.",
                 ),
               ]),
             },
@@ -1155,9 +1191,9 @@ async function run() {
           blockType: "formBlock",
           enableIntro: true,
           introContent: lexicalRichText([
-            richHeading("Request a BlockVibe Space", "h2"),
+            richHeading("Bring BlockVibe to Your Neighborhood", "h2"),
             richParagraph(
-              "Ready to bring BlockVibe to your neighborhood? Submit your info below and our team will reach out to set up your subdomain.",
+              "Submit a request to set up a digital workspace for your neighborhood association.",
             ),
           ]),
           form: spaceRequestForm.id,
@@ -1263,8 +1299,8 @@ async function run() {
           {
             link: {
               type: "custom",
-              label: "Give it a try",
-              url: "#try",
+              label: "Showcase Site",
+              url: "http://nog.localhost:3000",
             },
           },
         ],

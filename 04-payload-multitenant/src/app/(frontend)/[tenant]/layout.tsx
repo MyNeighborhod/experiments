@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { cn } from "@/utilities/ui"
 import { GeistMono } from "geist/font/mono"
 import { GeistSans } from "geist/font/sans"
-import { Playfair_Display, Gentium_Book_Plus, Montserrat } from "next/font/google"
+import { Playfair_Display, Gentium_Book_Plus, Montserrat, Quicksand, Nunito } from "next/font/google"
 import React from "react"
 import fs from "fs"
 import path from "path"
@@ -41,6 +41,18 @@ const montserrat = Montserrat({
   weight: ["400", "500", "700"],
 })
 
+const quicksand = Quicksand({
+  subsets: ["latin"],
+  variable: "--font-quicksand",
+  weight: ["500", "600", "700"],
+})
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  weight: ["300", "400", "600", "700"],
+})
+
 export default async function RootLayout({
   children,
   params,
@@ -71,6 +83,8 @@ export default async function RootLayout({
         playfair.variable,
         gentium.variable,
         montserrat.variable,
+        quicksand.variable,
+        nunito.variable,
       )}
       lang="en"
       suppressHydrationWarning
