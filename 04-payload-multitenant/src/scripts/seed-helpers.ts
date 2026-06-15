@@ -1,6 +1,6 @@
 /** Shared helpers for Payload seed scripts. */
 
-export function lexicalRichText(children: unknown[]): Record<string, unknown> {
+export function lexicalRichText(children: unknown[]): any {
   return {
     root: {
       type: "root",
