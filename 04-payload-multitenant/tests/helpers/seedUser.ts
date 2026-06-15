@@ -6,10 +6,9 @@ export const testUser = {
   password: "test",
 }
 
-const isLocal =
-  !process.env.PLAYWRIGHT_BASE_URL ||
-  process.env.PLAYWRIGHT_BASE_URL.includes("localhost") ||
-  process.env.PLAYWRIGHT_BASE_URL.includes("127.0.0.1")
+import { isRemoteTestEnv } from "./tenantUrl"
+
+const isLocal = !isRemoteTestEnv()
 
 /**
  * Seeds a test user for e2e admin tests.

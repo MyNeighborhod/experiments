@@ -1,16 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { login } from "../helpers/login"
 import "dotenv/config"
-
-function getTenantURL(baseURL: string, slug: string): string {
-  const url = new URL(baseURL)
-  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
-    url.hostname = `${slug}.localhost`
-  } else {
-    url.hostname = `${slug}.${url.hostname}`
-  }
-  return url.toString()
-}
+import { getTenantURL } from "../helpers/tenantUrl"
 
 test.describe("Multi-tenant Login and Admin Panel Verification", () => {
   test("NOG Tenant Admin can login and view dashboard controls", async ({ browser, baseURL }) => {

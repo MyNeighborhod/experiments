@@ -1,12 +1,19 @@
 import { test, expect, Page } from "@playwright/test"
 import { login } from "../helpers/login"
 import { seedTestUser, cleanupTestUser, testUser } from "../helpers/seedUser"
+import { isRemoteTestEnv } from "../helpers/tenantUrl"
 
 test.describe("Admin Panel", () => {
   let page: Page
 
   test.beforeAll(async ({ browser }, testInfo) => {
     test.setTimeout(120000)
+
+    if (isRemoteTestEnv() && (!process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD)) {
+      testInfo.skip(true, "Set TEST_USER_EMAIL and TEST_USER_PASSWORD for production admin tests")
+      return
+    }
+
     await seedTestUser()
 
     const context = await browser.newContext()

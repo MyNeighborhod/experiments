@@ -1,14 +1,5 @@
 import { test, expect } from "@playwright/test"
-
-function getTenantURL(baseURL: string, slug: string): string {
-  const url = new URL(baseURL)
-  if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
-    url.hostname = `${slug}.localhost`
-  } else {
-    url.hostname = `${slug}.${url.hostname}`
-  }
-  return url.toString()
-}
+import { getTenantURL } from "../helpers/tenantUrl"
 
 test.describe("Legal Pages (Terms of Service & Privacy Policy)", () => {
   test("can load Terms of Service on the default platform domain", async ({ page }) => {
