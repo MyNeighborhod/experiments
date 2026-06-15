@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test"
 import "dotenv/config"
-import { getTenantURL, isRemoteTestEnv } from "../helpers/tenantUrl"
+import { loginFrontendTenant } from "../helpers/login"
+import { getTenantURL } from "../helpers/tenantUrl"
 
 test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
   let nogBaseURL: string
@@ -142,7 +143,6 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
     browser,
     baseURL,
   }) => {
-    test.skip(isRemoteTestEnv(), "Twin Suns tenant is out of scope for production e2e")
     // twin-suns has seeded editor user: editor@twin-suns.blockvibe.org / editor1234
     const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
     const context = await browser.newContext({ baseURL: twinSunsBaseURL })
@@ -195,20 +195,16 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
     browser,
     baseURL,
   }) => {
-    test.skip(isRemoteTestEnv(), "Twin Suns tenant is out of scope for production e2e")
     // twin-suns has seeded contributor user: contributor@twin-suns.blockvibe.org / contrib1234
     const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
     const context = await browser.newContext({ baseURL: twinSunsBaseURL })
     const page = await context.newPage()
 
-    // Login as contributor
-    await page.goto("/login")
-    await page.fill("input[type='email']", "contributor@twin-suns.blockvibe.org")
-    await page.fill("input[type='password']", "contrib1234")
-    await page.click("button[type='submit']")
-
-    // Check we landed on profile page (not dashboard)
-    await page.waitForURL("**/profile")
+    await loginFrontendTenant(
+      page,
+      "contributor@twin-suns.blockvibe.org",
+      "contrib1234",
+    )
     await expect(page.locator("text=Twin Suns Contributor").first()).toBeVisible()
     await expect(page.getByText("contributor", { exact: true })).toBeVisible()
     await expect(page.getByText("Neighbor", { exact: true })).toBeVisible()
@@ -240,7 +236,6 @@ test.describe("Frontend Tenant Dashboard & Auth E2E Tests", () => {
     browser,
     baseURL,
   }) => {
-    test.skip(isRemoteTestEnv(), "Twin Suns tenant is out of scope for production e2e")
     const twinSunsBaseURL = getTenantURL(baseURL || "http://localhost:3000", "twin-suns")
     const context = await browser.newContext({ baseURL: twinSunsBaseURL })
     const page = await context.newPage()

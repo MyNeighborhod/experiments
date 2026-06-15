@@ -1,10 +1,8 @@
 import { test, expect } from "@playwright/test"
 import "dotenv/config"
-import { getTenantURL, isRemoteTestEnv } from "../helpers/tenantUrl"
+import { getTenantURL } from "../helpers/tenantUrl"
 
-const describeInvite = isRemoteTestEnv() ? test.describe.skip : test.describe
-
-describeInvite("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", () => {
+test.describe("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", () => {
   let nogBaseURL: string
 
   test.beforeAll(({ baseURL }) => {
@@ -51,7 +49,7 @@ describeInvite("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", (
     await adminPage.click("button:has-text('Send Invite')")
 
     // Assert success notification
-    await expect(adminPage.locator("text=Invite sent successfully")).toBeVisible()
+    await expect(adminPage.locator("text=/Invite sent successfully/i")).toBeVisible()
     await adminContext.close()
 
     // ==========================================

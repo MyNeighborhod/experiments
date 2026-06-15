@@ -2,6 +2,7 @@ import { test, expect, Page } from "@playwright/test"
 import { login } from "../helpers/login"
 import { seedTestUser, cleanupTestUser, testUser } from "../helpers/seedUser"
 import { isRemoteTestEnv } from "../helpers/tenantUrl"
+import { getSuperadminCredentials } from "../helpers/testCredentials"
 
 test.describe("Admin Panel", () => {
   let page: Page
@@ -9,8 +10,12 @@ test.describe("Admin Panel", () => {
   test.beforeAll(async ({ browser }, testInfo) => {
     test.setTimeout(120000)
 
-    if (isRemoteTestEnv() && (!process.env.TEST_USER_EMAIL || !process.env.TEST_USER_PASSWORD)) {
-      testInfo.skip(true, "Set TEST_USER_EMAIL and TEST_USER_PASSWORD for production admin tests")
+    const superadmin = isRemoteTestEnv() ? getSuperadminCredentials() : null
+    if (isRemoteTestEnv() && !superadmin) {
+      testInfo.skip(
+        true,
+        "Set TEST_USER_EMAIL/TEST_USER_PASSWORD or LOCAL_SUPERADMIN_USERNAME/LOCAL_SUPERADMIN_PASSWORD for production admin tests",
+      )
       return
     }
 
@@ -19,8 +24,8 @@ test.describe("Admin Panel", () => {
     const context = await browser.newContext()
     page = await context.newPage()
 
-    const email = process.env.TEST_USER_EMAIL || testUser.email
-    const password = process.env.TEST_USER_PASSWORD || testUser.password
+    const email = superadmin?.email ?? process.env.TEST_USER_EMAIL ?? testUser.email
+    const password = superadmin?.password ?? process.env.TEST_USER_PASSWORD ?? testUser.password
     await login({ page, user: { email, password } })
   })
 

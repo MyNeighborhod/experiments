@@ -151,6 +151,14 @@ Then redeploy media if needed (`./infra/sync-media.sh` or `./infra/deploy.sh`).
 
 ---
 
+## Production flows
+
+For deploy, seed, schema sync, DB push, media, and verification against **info** / **nog**:
+
+→ **[docs/deployment/production-flows.md](../../docs/deployment/production-flows.md)**
+
+---
+
 ## Related infra scripts
 
 | Script | Purpose |

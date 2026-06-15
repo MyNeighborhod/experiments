@@ -88,6 +88,18 @@ echo "--------------------------------------------------------"
 pnpm exec tsx src/scripts/seed-nog-users.ts
 
 echo "--------------------------------------------------------"
+echo "3. Syncing superadmin password for admin e2e"
+echo "--------------------------------------------------------"
+export LOCAL_SUPERADMIN_USERNAME=$(grep -E '^LOCAL_SUPERADMIN_USERNAME=' "$ENV_FILE" | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'")
+export LOCAL_SUPERADMIN_PASSWORD=$(grep -E '^LOCAL_SUPERADMIN_PASSWORD=' "$ENV_FILE" | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'")
+pnpm exec tsx src/scripts/seed-superadmin-password.ts
+
+echo "--------------------------------------------------------"
+echo "4. Seeding Twin Suns users for dashboard e2e"
+echo "--------------------------------------------------------"
+pnpm exec tsx src/scripts/seed-twin-suns-users.ts
+
+echo "--------------------------------------------------------"
 echo "Production content seed complete."
 echo "  Platform: ${NEXT_PUBLIC_SERVER_URL}"
 echo "  Showcase: ${NOG_SHOWCASE_URL}"

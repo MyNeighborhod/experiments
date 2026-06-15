@@ -17,7 +17,24 @@ Self-hosted deployment on a single AWS EC2 instance: Next.js + Payload + Postgre
 | **Seed prod content only** | `pnpm seed:prod-content` |
 | **Sync prod schema (no full replace)** | `./infra/sync-prod-schema.sh` |
 
-See also: [infra/README.md](../../infra/README.md) · [src/scripts/README.md](../../src/scripts/README.md) (seeding mental model & safety)
+See also: [infra/README.md](../../infra/README.md) · [src/scripts/README.md](../../src/scripts/README.md) (seeding) · **[production-flows.md](production-flows.md)** (day-to-day prod workflows)
+
+---
+
+## Production flows (summary)
+
+Full step-by-step workflows: **[docs/deployment/production-flows.md](production-flows.md)**
+
+| I want to… | Command |
+| ---------- | ------- |
+| Ship new app code | `./infra/deploy.sh` or `--skip-media` |
+| Fix `info` landing / NOG users only | `pnpm seed:prod-content` → restart payload |
+| Copy entire local DB to prod | `./infra/push-db-to-prod.sh` |
+| Add DB tables after code change | `./infra/sync-prod-schema.sh` |
+| Sync media files only | `./infra/sync-media.sh` |
+| Verify all e2e | `pnpm test:e2e:prod` |
+
+Typical release: **deploy** → (schema sync if needed) → **e2e**. Content-only fixes: **seed:prod-content** → **restart** → **e2e**.
 
 ---
 

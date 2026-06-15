@@ -26,9 +26,10 @@ export const getMeUser = async (args?: {
     serverUrl = "http://localhost:3000"
   }
 
-  const meUserReq = await fetch(`${serverUrl}/api/users/me`, {
+  const meUserReq = await fetch(`${serverUrl}/api/users/me?depth=1`, {
     headers: {
       Authorization: `JWT ${token}`,
+      Cookie: `payload-token=${token}`,
     },
   })
 

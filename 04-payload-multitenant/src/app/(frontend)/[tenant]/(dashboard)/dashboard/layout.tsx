@@ -21,19 +21,20 @@ export default async function DashboardLayout({ children, params }: Args) {
     nullUserRedirect: `/login`,
   })
 
-  // 2. Security validation: Ensure user is approved
-  const isApprovedUser = user.role === "superadmin" || user.status === "approved"
-  if (!isApprovedUser) {
-    redirect(`/logout`)
-  }
-
-  // 2.5 Security validation: Ensure only staff can access the dashboard portal
+  // 2. Non-staff users belong on profile, not the admin dashboard (check before approval
+  // logout paths so parallel RSC requests do not clear valid contributor sessions)
   const isStaff = user.role === "superadmin" || user.role === "admin" || user.role === "editor"
   if (!isStaff) {
     redirect(`/profile`)
   }
 
-  // 3. Resolve tenant details
+  // 3. Security validation: Ensure user is approved
+  const isApprovedUser = user.role === "superadmin" || user.status === "approved"
+  if (!isApprovedUser) {
+    redirect(`/login`)
+  }
+
+  // 4. Resolve tenant details
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) {
     notFound()
@@ -43,8 +44,7 @@ export default async function DashboardLayout({ children, params }: Args) {
   if (user.role !== "superadmin") {
     const userTenantIds = getUserTenantIds(user)
     if (!userTenantIds.includes(tenant.id)) {
-      // Clean up session and redirect to login with error
-      redirect(`/logout?error=unauthorized`)
+      redirect(`/login`)
     }
   }
 

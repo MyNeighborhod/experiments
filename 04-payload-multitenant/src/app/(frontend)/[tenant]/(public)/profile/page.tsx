@@ -4,6 +4,7 @@ import { getMeUser } from "@/utilities/getMeUser"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { SignOutButton } from "@/components/SignOutButton"
 
 type Args = {
   params: Promise<{
@@ -65,12 +66,7 @@ export default async function ProfilePage({ params }: Args) {
           </div>
 
           <div className="space-y-3 pt-2">
-            <Button
-              asChild
-              className="w-full py-6 text-sm font-semibold transition-all shadow-md bg-primary hover:bg-primary/95 text-primary-foreground"
-            >
-              <Link href="/logout">Sign Out</Link>
-            </Button>
+            <SignOutButton className="w-full py-6 text-sm font-semibold transition-all shadow-md bg-primary hover:bg-primary/95 text-primary-foreground" />
 
             {(user.role === "superadmin" || user.role === "admin" || user.role === "editor") && (
               <Button

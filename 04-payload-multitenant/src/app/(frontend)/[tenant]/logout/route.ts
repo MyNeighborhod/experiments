@@ -9,7 +9,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ ten
 
 export async function GET(request: Request, { params }: { params: Promise<{ tenant: string }> }) {
   const { tenant } = await params
-  const cookieStore = await cookies()
-  cookieStore.delete("payload-token")
-  return NextResponse.redirect(new URL(`/${tenant}/login`, request.url))
+
+  const host =
+    request.headers.get("x-forwarded-host") ||
+    request.headers.get("host") ||
+    new URL(request.url).host
+  const protocol =
+    host.includes("localhost") || host.includes("127.0.0.1") ? "http:" : "https:"
+  const loginUrl = new URL(`/${tenant}/login`, `${protocol}//${host}`)
+
+  // Do not clear cookies on GET — Next.js may prefetch linked /logout routes.
+  return NextResponse.redirect(loginUrl)
 }

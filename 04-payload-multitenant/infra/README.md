@@ -56,7 +56,7 @@ Use `--yes` to skip the confirmation prompt, `--skip-media` for database only.
 
 4. Open `https://<your-domain>` (from `terraform output domain_url`).
 
-Full details: [docs/deployment/readme.md](../docs/deployment/readme.md)
+Full details: [docs/deployment/readme.md](../docs/deployment/readme.md) · **Day-to-day flows:** [production-flows.md](../docs/deployment/production-flows.md)
 
 ## Files in this directory
 

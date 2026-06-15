@@ -2,6 +2,9 @@ import type { CollectionConfig } from "payload"
 
 import { isApproved, usersRead, usersCreate, usersUpdate, usersDelete } from "../../access/roles"
 import { usersBeforeChangeHook } from "./beforeChange"
+import { getServerSideURL } from "../../utilities/getURL"
+
+const useSecureCookies = getServerSideURL().startsWith("https://")
 
 export const Users: CollectionConfig = {
   slug: "users",
@@ -20,7 +23,12 @@ export const Users: CollectionConfig = {
     defaultColumns: ["name", "email", "role", "status"],
     useAsTitle: "name",
   },
-  auth: true,
+  auth: {
+    cookies: {
+      secure: useSecureCookies,
+      sameSite: "Lax",
+    },
+  },
   hooks: {
     beforeChange: [usersBeforeChangeHook],
   },

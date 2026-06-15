@@ -56,11 +56,12 @@ export async function sendInviteAction(name: string, email: string, tenantId: st
     const protocol = host.includes("localhost") ? "http" : "https"
     const inviteUrl = `${protocol}://${host}/invite?token=${token}`
 
-    // Send Email via Payload's transport configuration
-    await payload.sendEmail({
-      to: email,
-      subject: `Invitation to join ${host}`,
-      html: `
+    // Send Email via Payload's transport configuration (invite record already created)
+    try {
+      await payload.sendEmail({
+        to: email,
+        subject: `Invitation to join ${host}`,
+        html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded-lg;">
           <h2 style="color: #0f172a; margin-bottom: 16px;">Welcome to the Neighborhood Portal!</h2>
           <p style="color: #334155; font-size: 16px; line-height: 24px;">Hello ${name},</p>
@@ -71,7 +72,13 @@ export async function sendInviteAction(name: string, email: string, tenantId: st
           <p style="color: #64748b; font-size: 12px;">If the button above does not work, copy and paste this link into your browser:<br/><a href="${inviteUrl}">${inviteUrl}</a></p>
         </div>
       `,
-    })
+      })
+    } catch (emailError) {
+      payload.logger.warn(
+        { err: emailError },
+        `Invite created for ${email} but email delivery failed`,
+      )
+    }
 
     return { success: true }
   } catch (err: any) {

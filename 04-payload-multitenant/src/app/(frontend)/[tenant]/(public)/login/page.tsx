@@ -33,6 +33,7 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/users/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -56,8 +57,9 @@ export default function LoginPage() {
         return
       }
 
-      // Success: redirect to dashboard
-      router.push("/dashboard")
+      const isStaff =
+        user.role === "superadmin" || user.role === "admin" || user.role === "editor"
+      router.push(isStaff ? "/dashboard" : "/profile")
       router.refresh()
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred. Please try again.")

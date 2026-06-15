@@ -98,13 +98,31 @@ pnpm exec playwright test tests/e2e/multitenant.e2e.spec.ts --config=playwright.
   pnpm exec playwright test tests/e2e/multitenant.e2e.spec.ts --config=playwright.config.ts --ui
   ```
 
+#### Running all tests
+
+| Target | Headless | UI mode |
+| ------ | -------- | ------- |
+| **Local** (`http://localhost:3000`) | `pnpm test:e2e` | `pnpm test:e2e:ui` |
+| **Prod** (`https://info.blockvibe.org`) | `pnpm test:e2e:prod` | `pnpm test:e2e:prod:ui` |
+
+Both commands run **all** specs in `tests/e2e/` (admin, dashboard, invite, multitenant, platform, frontend, legal, neighbor).
+
+Override the URL for any run:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://my-staging.example.com pnpm test:e2e
+```
+
 #### Production/Staging URL
 
 Executes E2E tests against a remote production environment. This bypasses the local dev server compilation and does not attempt to seed the database directly from the runner.
 
 ```bash
 pnpm test:e2e:prod
+pnpm test:e2e:prod:ui
 ```
+
+Production flows (deploy → seed → verify): [docs/deployment/production-flows.md](../docs/deployment/production-flows.md)
 
 _Note: You can override the production URL dynamically in the command line:_
 
@@ -136,6 +154,6 @@ The E2E tests are configured via [playwright.config.ts](file:///Users/eugen/dev/
 2. **Subdomain Resolution**: Test files (such as `multitenant.e2e.spec.ts`) resolve subdomains against this root domain (e.g. `nog.localhost` or `beaverdale.localhost` for local, and `nog.production.com` or `beaverdale.production.com` for production).
 3. **Database Seeding**:
    - **Local runs**: Local tests will run `seedTestUser()` to inject mock credentials into the database.
-   - **Production runs**: Seeding is automatically skipped when `PLAYWRIGHT_BASE_URL` points to a non-local URL. Instead, tests use the pre-configured credentials in your `.env`:
-     - `TENANT_NOG_USERNAME` / `TENANT_NOG_PASSWORD`
-     - `TENANT_BEAVERDALE_USERNAME` / `TENANT_BEAVERDALE_PASSWORD`
+   - **Production runs**: Seeding is automatically skipped when `PLAYWRIGHT_BASE_URL` points to a non-local URL. Instead, tests use credentials from `.env`:
+     - `TENANT_NOG_USERNAME` / `TENANT_NOG_PASSWORD` (and other `TENANT_*` vars per tenant)
+     - **Admin Panel** (`admin.e2e.spec.ts`): `TEST_USER_EMAIL` / `TEST_USER_PASSWORD`, or fallback `LOCAL_SUPERADMIN_USERNAME` / `LOCAL_SUPERADMIN_PASSWORD`

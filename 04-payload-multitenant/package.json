@@ -26,8 +26,9 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
+    "test:e2e:ui": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts --ui",
     "test:e2e:prod": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PLAYWRIGHT_BASE_URL=https://info.blockvibe.org playwright test --config=playwright.config.ts",
-    "test:e2e:prod:nog-info": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PLAYWRIGHT_BASE_URL=https://info.blockvibe.org playwright test --config=playwright.config.ts tests/e2e/platform.e2e.spec.ts tests/e2e/frontend.e2e.spec.ts tests/e2e/legal.e2e.spec.ts tests/e2e/neighbor.e2e.spec.ts tests/e2e/dashboard.e2e.spec.ts tests/e2e/multitenant.e2e.spec.ts",
+    "test:e2e:prod:ui": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" PLAYWRIGHT_BASE_URL=https://info.blockvibe.org playwright test --config=playwright.config.ts --ui",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
