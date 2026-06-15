@@ -1,8 +1,10 @@
 import { test, expect } from "@playwright/test"
 import "dotenv/config"
-import { getTenantURL } from "../helpers/tenantUrl"
+import { getTenantURL, isRemoteTestEnv } from "../helpers/tenantUrl"
 
-test.describe("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", () => {
+const describeInvite = isRemoteTestEnv() ? test.describe.skip : test.describe
+
+describeInvite("User Invite & Acceptance Staging Flow E2E (Failing TDD Spec)", () => {
   let nogBaseURL: string
 
   test.beforeAll(({ baseURL }) => {

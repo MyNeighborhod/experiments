@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { login } from "../helpers/login"
 import "dotenv/config"
-import { getTenantURL } from "../helpers/tenantUrl"
+import { getTenantURL, isRemoteTestEnv } from "../helpers/tenantUrl"
 
 test.describe("Multi-tenant Login and Admin Panel Verification", () => {
   test("NOG Tenant Admin can login and view dashboard controls", async ({ browser, baseURL }) => {
@@ -36,6 +36,7 @@ test.describe("Multi-tenant Login and Admin Panel Verification", () => {
     browser,
     baseURL,
   }) => {
+    test.skip(isRemoteTestEnv(), "Beaverdale is out of scope for production e2e")
     const targetBaseURL = getTenantURL(baseURL || "http://localhost:3000", "beaverdale")
     const context = await browser.newContext({ baseURL: targetBaseURL })
     const page = await context.newPage()

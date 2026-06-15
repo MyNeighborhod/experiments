@@ -14,8 +14,10 @@ Self-hosted deployment on a single AWS EC2 instance: Next.js + Payload + Postgre
 | **Code-only deploy** | `./infra/deploy.sh --skip-media` |
 | **Media-only sync** | `./infra/sync-media.sh` |
 | **Push local DB → prod** | `./infra/push-db-to-prod.sh` |
+| **Seed prod content only** | `pnpm seed:prod-content` |
+| **Sync prod schema (no full replace)** | `./infra/sync-prod-schema.sh` |
 
-See also: [infra/README.md](../../infra/README.md)
+See also: [infra/README.md](../../infra/README.md) · [src/scripts/README.md](../../src/scripts/README.md) (seeding mental model & safety)
 
 ---
 
@@ -95,22 +97,39 @@ Fill in secrets (`PAYLOAD_SECRET`, `DB_PASSWORD`, etc.). `deploy.sh` uploads thi
 
 `NEXT_PUBLIC_SERVER_URL` must be your HTTPS domain (e.g. `https://info.blockvibe.org`).
 
-### Step 3: Seed local content (optional)
+### Step 3: Seed content (optional)
 
-If the production database is empty, seed locally first, then deploy (media syncs with the deploy):
+`deploy.sh` ships code and media; it does **not** seed or migrate the database.
+
+**Option A — Seed production in place** (platform landing + NOG users only; does not wipe the full DB):
 
 ```bash
-pnpm dev
-# Seed via admin UI or: npx tsx src/scripts/seed-nog.ts
+pnpm seed:prod-content
 ```
 
-To push your **local database** to production (local is source of truth):
+Uses an SSH tunnel to prod Postgres. See [src/scripts/README.md](../../src/scripts/README.md) for how local vs prod targeting works and what each script is safe to run.
+
+**Option B — Build locally, push entire DB** (local is source of truth):
 
 ```bash
+pnpm tsx src/scripts/seed-nog.ts   # or seed locally however you prefer
 ./infra/push-db-to-prod.sh
 ```
 
-This replaces the production Postgres data and syncs `public/media/`. `deploy.sh` does not migrate the database — use `push-db-to-prod.sh` when content changed locally.
+This **replaces** production Postgres and syncs `public/media/`.
+
+**Option C — Schema only** (new tables/columns, keep prod data):
+
+```bash
+./infra/sync-prod-schema.sh
+```
+
+After seeding production, restart the app if pages look stale:
+
+```bash
+ssh -i infra/id_rsa ubuntu@$(cd infra && terraform output -raw instance_public_ip) \
+  "cd /home/ubuntu/app && sudo docker compose restart payload"
+```
 
 ### Step 4: Deploy
 

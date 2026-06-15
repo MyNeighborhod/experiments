@@ -16,6 +16,8 @@ This builds the Docker image **on your machine** (not on EC2), syncs media, uplo
 | `./infra/deploy.sh --skip-media` | Code-only deploy (faster)                                           |
 | `./infra/sync-media.sh`          | Media-only sync, no rebuild                                         |
 | `./infra/push-db-to-prod.sh`     | **Replace production DB** with local (source of truth) + sync media |
+| `pnpm seed:prod-content`         | Seed prod **content only** (platform home + NOG users) via SSH tunnel |
+| `./infra/sync-prod-schema.sh`    | Pull prod DB → schema push locally → push back (no full content replace) |
 
 ### Local DB → production (source of truth)
 
@@ -60,8 +62,10 @@ Full details: [docs/deployment/readme.md](../docs/deployment/readme.md)
 
 | File            | Purpose                                                   |
 | --------------- | --------------------------------------------------------- |
-| `deploy.sh`     | Main deploy script                                        |
-| `sync-media.sh` | Sync `public/media/` to the server only                   |
+| `deploy.sh`           | Main deploy script                                        |
+| `seed-prod-content.sh`| SSH tunnel + platform/NOG user seeds (also `pnpm seed:prod-content`) |
+| `sync-prod-schema.sh` | Prod schema sync without full DB replace                  |
+| `sync-media.sh`       | Sync `public/media/` to the server only                   |
 | `Caddyfile`     | HTTPS + static `/media` serving (uploaded on each deploy) |
 | `userdata.sh`   | EC2 first-boot provisioning (Docker, Caddy, swap)         |
 | `main.tf`       | EC2, Elastic IP, security group, Cloudflare DNS           |

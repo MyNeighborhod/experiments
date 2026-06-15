@@ -87,20 +87,29 @@ Once the database is running:
 
 ## 6. Seed/Reset Data
 
-If you need to seed or reset the database with tenant-specific layout configurations (pages, posts, header, footer, etc.), you can run the following script commands:
+Seeding always writes to whatever database `DATABASE_URL` points at — usually **local** when you run scripts directly. For production, use `pnpm seed:prod-content` (see [src/scripts/README.md](src/scripts/README.md) for the full mental model and safety notes).
 
-- **Seed North of Grand (NOG):**
-  ```bash
-  pnpm tsx src/scripts/seed-nog.ts
-  ```
-- **Seed Beaverdale:**
-  ```bash
-  pnpm tsx src/scripts/seed-beaverdale.ts
-  ```
-- **Global Database Seed (Default Tenant, posts, pages):**
-  ```bash
-  pnpm tsx src/scripts/test-seed.ts
-  ```
+**Local quick commands:**
+
+```bash
+# Full NOG + platform reset (destructive)
+pnpm tsx src/scripts/seed-nog.ts
+
+# Platform landing only (info.blockvibe.org content)
+pnpm seed:default-platform
+
+# NOG admin + neighbor users only
+pnpm seed:nog-users
+
+# Beaverdale tenant
+pnpm tsx src/scripts/seed-beaverdale.ts
+```
+
+**Production content only** (platform home + nog users, via SSH tunnel):
+
+```bash
+pnpm seed:prod-content
+```
 
 ---
 

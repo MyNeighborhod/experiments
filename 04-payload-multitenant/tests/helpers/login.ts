@@ -14,9 +14,12 @@ export interface LoginOptions {
  */
 export async function login({ page, user }: LoginOptions): Promise<void> {
   await page.goto("/admin/login")
+  await page.waitForLoadState("networkidle")
 
-  await page.fill("#field-email", user.email)
-  await page.fill("#field-password", user.password)
+  const inputs = page.locator("form input:visible")
+  await inputs.first().waitFor({ state: "visible" })
+  await inputs.nth(0).fill(user.email)
+  await inputs.nth(1).fill(user.password)
   await page.click('button[type="submit"]')
 
   await page.waitForURL("**/admin")

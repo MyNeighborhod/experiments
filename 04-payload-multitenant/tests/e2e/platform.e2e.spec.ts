@@ -9,9 +9,9 @@ test.describe("BlockVibe Platform Landing Page E2E Tests", () => {
 
     await expect(page.locator("text=One platform for your neighborhood")).toBeVisible()
     await expect(page.locator("text=See BlockVibe in Action")).toBeVisible()
-    await expect(page.locator("text=Visit Example Site")).toBeVisible()
+    await expect(page.locator("text=Visit Site")).toBeVisible()
 
-    await expect(page.locator("text=Request a BlockVibe Space")).toBeVisible()
+    await expect(page.locator("text=Bring BlockVibe to Your Neighborhood")).toBeVisible()
     await expect(page.locator("label:has-text('Neighborhood / Tenant Name')")).toBeVisible()
     await expect(page.locator("label:has-text('Contact Email')")).toBeVisible()
     await expect(page.locator("label:has-text('Phone Number')")).toBeVisible()
@@ -21,7 +21,7 @@ test.describe("BlockVibe Platform Landing Page E2E Tests", () => {
   test("2. Displays correct NOG example link dynamically", async ({ page, baseURL }) => {
     await page.goto("/")
 
-    const exampleLink = page.locator("a:has-text('Visit Example Site')")
+    const exampleLink = page.locator("a:has-text('Visit Site')")
     await expect(exampleLink).toBeVisible()
 
     const href = await exampleLink.getAttribute("href")

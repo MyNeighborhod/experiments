@@ -232,7 +232,7 @@ To seed the entire database with a default presentation layout (default tenant) 
 
 #### Standalone Tenant Seeding (Granular)
 
-We have added scripts to seed or reset individual tenant neighborhoods (`nog` and `beaverdale`) programmatically. These scripts will clean up existing data for that specific tenant and recreate its custom layout, media, pages, posts, header, and footer without affecting other tenants:
+Scripts seed or reset individual tenants programmatically. **Which database gets written depends on `DATABASE_URL`** — see [src/scripts/README.md](src/scripts/README.md) for the mental model, prod vs local commands, and safety notes.
 
 - **Seed/Reset North of Grand (NOG)** (uses Light Theme):
   ```bash
@@ -241,6 +241,10 @@ We have added scripts to seed or reset individual tenant neighborhoods (`nog` an
 - **Seed/Reset Beaverdale** (uses Dark Theme):
   ```bash
   npx tsx src/scripts/seed-beaverdale.ts
+  ```
+- **Production content only** (platform home + NOG users):
+  ```bash
+  pnpm seed:prod-content
   ```
 
 The seed script will also create a demo user for demonstration purposes only:
