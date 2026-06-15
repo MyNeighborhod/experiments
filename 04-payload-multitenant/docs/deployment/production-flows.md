@@ -18,7 +18,8 @@ Related docs:
 | **Env secrets** | `/home/ubuntu/app/.env` (from `.env.production`) | `deploy.sh` upload |
 | **Postgres data** | Docker volume on EC2 | Seeds, `push-db-to-prod.sh`, admin UI |
 | **Media files** | `/var/www/blockvibe/media` on EBS | `deploy.sh`, `sync-media.sh`, admin uploads |
-| **HTTPS / domains** | Caddy (`infra/Caddyfile`) | `deploy.sh` reload |
+| **DNS** | Cloudflare (`*.blockvibe.org` wildcard + optional explicit A records) | `terraform apply` |
+| **HTTPS / domains** | Caddy (`infra/Caddyfile`) — explicit host list, not a DNS wildcard | `deploy.sh` reload |
 
 `deploy.sh` **does not** migrate the database or seed CMS content. After a code deploy, if the app expects new tables/columns, run a schema or DB flow below.
 
@@ -266,11 +267,29 @@ pnpm tsx src/scripts/seed-nog.ts    # optional: refresh local
 pnpm test:e2e:prod
 ```
 
-### E. New tenant subdomain (HTTPS)
+### E. New tenant subdomain
 
-1. Add hostname to `infra/Caddyfile`
-2. `./infra/deploy.sh --skip-media`
-3. Create tenant + content in admin or via seed scripts
+DNS and HTTPS are separate steps. Wildcard DNS does **not** automatically enable HTTPS.
+
+| Layer | Wildcard? | What to do for a new tenant |
+| ----- | --------- | --------------------------- |
+| **DNS** (Cloudflare) | Yes — `*.blockvibe.org` works | Usually nothing; verify with `dig +short A <slug>.blockvibe.org` |
+| **HTTPS** (Caddy) | No — explicit host list only | Add hostname to `infra/Caddyfile` and redeploy |
+
+1. Create tenant in Payload (slug matches subdomain, e.g. `twin-suns` → `twin-suns.blockvibe.org`)
+2. Add `twin-suns.blockvibe.org` (or your slug) to `infra/Caddyfile`
+3. `./infra/deploy.sh --skip-media`
+4. Seed users/content if needed (`pnpm seed:prod-content` or tenant-specific script)
+5. Verify:
+
+   ```bash
+   dig +short A twin-suns.blockvibe.org     # → Elastic IP (DNS wildcard)
+   curl -sI https://twin-suns.blockvibe.org/ # → HTTP/2 200 (only after Caddy step)
+   ```
+
+If DNS resolves but HTTPS fails with a TLS error, the hostname is missing from `Caddyfile` — not a Cloudflare problem.
+
+See [readme.md § DNS and HTTPS](readme.md#7-dns-and-https-cloudflare--caddy) for full details and verification results.
 
 ---
 

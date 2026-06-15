@@ -194,15 +194,94 @@ Stay on EBS + rsync while media is small (tens of MB). Move to **S3 + `@payloadc
 
 ---
 
-## 7. HTTPS (Caddy)
+## 7. DNS and HTTPS (Cloudflare + Caddy)
 
-HTTPS is configured automatically via `infra/Caddyfile` (uploaded on every deploy). Caddy obtains Let's Encrypt certificates for the domains listed in that file.
+Production uses **two separate layers**: Cloudflare DNS (where traffic goes) and Caddy TLS (whether HTTPS works). They are not the same thing.
 
-To add a new tenant subdomain, add it to `infra/Caddyfile` and redeploy.
+### DNS wildcard — works
+
+Terraform creates both a wildcard and optional explicit A records in Cloudflare (`infra/main.tf`):
+
+| Record | Purpose |
+| --- | --- |
+| `*.blockvibe.org` | Wildcard — any subdomain resolves to the Elastic IP |
+| `info`, `nog`, `beaverdale`, … | Explicit A records (optional; same IP as wildcard) |
+
+Verified behavior (June 2026):
+
+| Host | DNS resolves? |
+| --- | --- |
+| `info.blockvibe.org` | Yes → `52.0.95.158` |
+| `nog.blockvibe.org` | Yes → `52.0.95.158` |
+| `twin-suns.blockvibe.org` | Yes → `52.0.95.158` |
+| `fake-tenant-test.blockvibe.org` (made-up) | Yes → `52.0.95.158` |
+
+**Conclusion:** the Cloudflare `*.blockvibe.org` wildcard works. You do **not** need a new Cloudflare A record for every tenant subdomain — DNS routing is already covered.
+
+Explicit records in the Cloudflare dashboard are redundant when they point to the same IP as the wildcard; they do not hurt, but they are not required for resolution.
+
+Records should stay **DNS only** (grey cloud, `proxied = false` in Terraform) so Caddy on EC2 can obtain Let's Encrypt certificates directly.
+
+### HTTPS — only listed hosts work
+
+DNS sends traffic to the server; **Caddy decides which hostnames get TLS certificates**. Caddy uses an explicit hostname list, not a DNS wildcard:
+
+```2:2:infra/Caddyfile
+info.blockvibe.org, nog.blockvibe.org, beaverdale.blockvibe.org, oakwood.blockvibe.org, woodland-dsm.blockvibe.org, twin-suns.blockvibe.org {
+```
+
+Verified behavior:
+
+| Host | HTTPS |
+| --- | --- |
+| Hostnames in `Caddyfile` (e.g. `twin-suns`, `beaverdale`) | 200 OK |
+| Random subdomain (DNS only, not in Caddyfile) | TLS error (`tlsv1 alert internal error`) |
+
+**Conclusion:** wildcard DNS does **not** imply wildcard HTTPS. A new tenant subdomain needs its hostname added to `infra/Caddyfile` and a redeploy before browsers can use `https://`.
+
+### Flow diagram
+
+```mermaid
+flowchart LR
+  subgraph dns [Cloudflare DNS]
+    W["*.blockvibe.org"] --> IP["Elastic IP"]
+    E["explicit A records"] --> IP
+  end
+  subgraph server [EC2 / Caddy]
+    IP --> Caddy{Listed in Caddyfile?}
+    Caddy -->|yes| OK["HTTPS 200"]
+    Caddy -->|no| FAIL["TLS error"]
+  end
+```
+
+### Adding a new tenant subdomain (current approach)
+
+1. Create the tenant in Payload (slug = subdomain, e.g. `my-hood` → `my-hood.blockvibe.org`).
+2. Add `my-hood.blockvibe.org` to `infra/Caddyfile`.
+3. Redeploy: `./infra/deploy.sh --skip-media`
+4. Verify: `curl -sI https://my-hood.blockvibe.org/`
+
+No Cloudflare DNS change is required if the wildcard record already exists.
+
+Quick DNS check from your machine:
+
+```bash
+dig +short A my-hood.blockvibe.org          # should return Elastic IP
+curl -sI https://my-hood.blockvibe.org/     # 200 only after Caddyfile + deploy
+```
+
+### Wildcard HTTPS (optional, not configured)
+
+To serve **any** `*.blockvibe.org` over HTTPS without editing Caddy per tenant:
+
+- Configure Caddy with a **wildcard certificate** via Let's Encrypt DNS-01 (requires a Cloudflare API token in Caddy), or
+- Use **on-demand TLS** with an app endpoint that approves hostnames (see comments in `infra/userdata.sh`).
+
+Until one of those is implemented, stick with the explicit Caddyfile list.
 
 ### On-demand TLS (advanced)
 
-For arbitrary custom domains without listing each one in the Caddyfile, see the on-demand TLS section in `userdata.sh` comments and implement `/api/caddy-check` in the app.
+For arbitrary **custom domains** (not `*.blockvibe.org`), see the on-demand TLS section in `userdata.sh` comments and implement `/api/caddy-check` in the app.
 
 ---
 

@@ -68,4 +68,11 @@ Full details: [docs/deployment/readme.md](../docs/deployment/readme.md) · **Day
 | `sync-media.sh`       | Sync `public/media/` to the server only                   |
 | `Caddyfile`     | HTTPS + static `/media` serving (uploaded on each deploy) |
 | `userdata.sh`   | EC2 first-boot provisioning (Docker, Caddy, swap)         |
-| `main.tf`       | EC2, Elastic IP, security group, Cloudflare DNS           |
+| `main.tf`       | EC2, Elastic IP, security group, Cloudflare DNS (`*.blockvibe.org` wildcard + optional explicit A records) |
+
+### DNS vs HTTPS
+
+- **Cloudflare wildcard DNS** (`*.blockvibe.org`) works — any subdomain resolves to the Elastic IP without per-tenant DNS records.
+- **Caddy HTTPS** does not use a wildcard — each tenant hostname must be listed in `Caddyfile` and deployed.
+
+Full explanation and verification commands: [docs/deployment/readme.md § DNS and HTTPS](../docs/deployment/readme.md#7-dns-and-https-cloudflare--caddy).
